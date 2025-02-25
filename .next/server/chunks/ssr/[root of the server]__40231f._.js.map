@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 15, "column": 0}, "map": {"version":3,"sources":["file:///Users/ericphan205/Downloads/FPTU%20-%20IT%20CODE/EXE2/Tixflow-website/src/components/Header.tsx"],"sourcesContent":["\"use client\";\n\nimport Link from \"next/link\";\n\nexport default function Header() {\n  return (\n    <header>\n      <div>\n        <nav className=\"\">\n        <Link href=\"/home\">Home</Link>\n        <Link href=\"/concerts\">Concerts</Link>\n        <Link href=\"/singers\">Singers</Link>\n        </nav>\n        <div className=\"\">\n          logo\n        </div>\n        <div>\n          \n        </div>\n      </div>\n    </header>\n  );\n}\n"],"names":[],"mappings":";;;;AAEA;AAFA;;;AAIe,SAAS;IACtB,qBACE,8OAAC;kBACC,cAAA,8OAAC;;8BACC,8OAAC;oBAAI,WAAU;;sCACf,8OAAC,4JAAA,CAAA,UAAI;4BAAC,MAAK;sCAAQ;;;;;;sCACnB,8OAAC,4JAAA,CAAA,UAAI;4BAAC,MAAK;sCAAY;;;;;;sCACvB,8OAAC,4JAAA,CAAA,UAAI;4BAAC,MAAK;sCAAW;;;;;;;;;;;;8BAEtB,8OAAC;oBAAI,WAAU;8BAAG;;;;;;8BAGlB,8OAAC;;;;;;;;;;;;;;;;AAMT"}},
-    {"offset": {"line": 85, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}
