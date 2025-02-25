@@ -10,13 +10,15 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage =
-    pathname === "/login" || pathname === "/register" || pathname === "/verify";
+  const authPages = ["/login", "/register", "/verify"];
+  const isAuthPage = authPages.includes(pathname);
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       {!isAuthPage && <Header />}
-      <main className="flex-1">{children}</main>
+      <main key={pathname} className="flex-1">
+        {children}
+      </main>
       {!isAuthPage && <Footer />}
     </div>
   );
