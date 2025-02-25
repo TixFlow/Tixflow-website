@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, X } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -38,8 +38,23 @@ export default function Login() {
     },
   });
 
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
   function onSubmit(values: any) {
     console.log("Dữ liệu form:", values);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-white">
+        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -71,10 +86,10 @@ export default function Login() {
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                         <input
                           id="email"
+                          name="email"
                           type="email"
                           placeholder="Nhập email"
                           autoComplete="email"
-                          {...field}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full pl-10 pr-8 py-2 border rounded-md"
