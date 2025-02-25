@@ -18,9 +18,11 @@ export default function Header() {
         </nav>
         <div className="flex-shrink-0">
           <img 
-            src="/logo.png" 
+            src="/logo/logo.png" 
             alt="TixFlow Logo" 
-            className="w-auto mx-auto cursor-pointer" 
+            width={100} 
+            height={60}
+            className="w-20 h-auto cursor-pointer"
             onClick={() => router.push("/")}
           />
         </div>
