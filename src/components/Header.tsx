@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-
-import Image from "next/image";
-import GradientButton from "./ui/ButtonComponent";
 import { Button } from "./ui/button";
 import Logo from "./Logo";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const NAV_ITEMS = [
   { href: "/", label: "Trang chủ" },
@@ -17,8 +14,18 @@ const NAV_ITEMS = [
   { href: "/our-tickets", label: "Vé chúng tôi" },
 ];
 
-const Fb = "https://www.facebook.com/profile.php?id=61573137565358";
-const Ig = "https://www.instagram.com/tixflow_official/";
+const SOCIAL_LINKS = [
+  {
+    href: "https://www.facebook.com/profile.php?id=61573137565358",
+    icon: <FaFacebook size={22} />,
+    label: "Facebook",
+  },
+  {
+    href: "https://www.instagram.com/tixflow_official/",
+    icon: <FaInstagram size={22} />,
+    label: "Instagram",
+  },
+];
 
 export default function Header() {
   const router = useRouter();
@@ -44,14 +51,17 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center space-x-6">
-          <Facebook
-            className="w-7 h-7 text-gray-700 dark:text-gray-300 cursor-pointer"
-            onClick={() => window.open(Fb, "_blank")}
-          />
-          <Instagram
-            className="w-7 h-7 text-gray-700 dark:text-gray-300 cursor-pointer"
-            onClick={() => window.open(Ig, "_blank")}
-          />
+          {SOCIAL_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-700 dark:text-gray-300 hover:text-orange-500"
+            >
+              {link.icon}
+            </a>
+          ))}
 
           <Button
             className="flex items-center space-x-2 text-base rounded-3xl border border-black text-black bg-[#F6F6F6] hover:bg-gray-200"

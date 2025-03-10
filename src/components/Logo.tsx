@@ -19,6 +19,7 @@ const Logo: React.FC<LogoProps> = ({
         <Image
           src="/logo/logo.png"
           alt="Logo"
+          sizes="(max-width: 768px) 100px, (max-width: 1200px) 150px, 200px"
           fill
           priority
           className="object-contain"

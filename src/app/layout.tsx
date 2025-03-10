@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { ReactNode } from "react";
 import ClientLayout from "@/components/ClientLayout";
 import { Metadata } from "next";
+import { ReduxProvider } from "@/redux/provider";
 
 export const metadata: Metadata = {
   title: "Tixflow",
@@ -15,7 +16,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" className={roboto.className}>
       <body>
-        <ClientLayout>{children}</ClientLayout>
+        <ReduxProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </ReduxProvider>
       </body>
     </html>
   );
