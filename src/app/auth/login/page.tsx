@@ -1,24 +1,23 @@
 "use client";
 
 import AuthLayout from "@/components/AuthLayout";
-import GradientButton from "@/components/ui/ButtonComponent";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
@@ -28,33 +27,40 @@ const formSchema = z.object({
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
-  useEffect(() => {
+  async function onSubmit(values: { email: string; password: string }) {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Đăng nhập thất bại!");
+      }
+
+      const data = await response.json();
+
+      Cookies.set("token", data.token, { expires: 7, secure: true });
+      router.push("/");
+
+      console.log("Đăng nhập thành công!", data);
+      form.reset();
+    } catch (error) {
+      console.error((error as Error).message);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
-
-  function onSubmit(values: any) {
-    console.log("Dữ liệu form:", values);
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-      </div>
-    );
+    }
   }
 
   return (
@@ -70,7 +76,7 @@ export default function Login() {
       <div className="flex w-full">
         <div className="w-full lg:w-1/2 flex justify-center items-center p-10">
           <div className="max-w-md w-full space-y-6">
-            <h1 className="text-3xl font-bold text-center">Sign In</h1>
+            <h1 className="text-3xl font-bold text-center">Đăng nhập</h1>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -81,28 +87,15 @@ export default function Login() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                         <input
-                          id="email"
-                          name="email"
+                          {...field}
                           type="email"
                           placeholder="Nhập email"
-                          autoComplete="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
                           className="w-full pl-10 pr-8 py-2 border rounded-md"
                         />
-                        {email && (
-                          <button
-                            type="button"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            onClick={() => setEmail("")}
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -114,12 +107,11 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="password">Mật khẩu</FormLabel>
+                      <FormLabel>Mật khẩu</FormLabel>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                         <input
-                          id="password"
-                          name="password"
+                          {...field}
                           type={showPassword ? "text" : "password"}
                           placeholder="Nhập mật khẩu"
                           className="w-full pl-10 pr-8 py-2 border rounded-md"
@@ -145,21 +137,29 @@ export default function Login() {
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 appearance-none border border-gray-400 rounded-full flex items-center justify-center checked:before:content-[''] checked:before:block checked:before:w-2 checked:before:h-2 checked:before:bg-black checked:before:rounded-full focus:ring-2 focus:ring-black-500"
                     />
-                    <span>Remember me</span>
+
+                    <span>nhớ mật khẩu</span>
                   </label>
                   <Link
                     href="/forgot-password"
                     className="text-black-600 hover:underline"
                   >
-                    Forgot password?
+                    Quên mật khẩu?
                   </Link>
                 </div>
 
-                <GradientButton className="w-full text-white py-2 rounded-md hover:bg-blue-700 transition">
-                  <span>{loading ? "Đang đăng nhập..." : "Login"}</span>
-                </GradientButton>
+                <Button
+                  className="w-full text-white py-2 rounded-md bg-gradient-to-r from-[#FDB777] to-[#FD9346] hover:from-[#FF7F50] hover:to-[#FF6200] transition-all"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    "Tiếp tục"
+                  )}
+                </Button>
 
                 <Button
                   type="button"
@@ -171,23 +171,22 @@ export default function Login() {
                     width={20}
                     height={20}
                   />
-                  <span>Sign in with Google</span>
+                  <span>Đăng nhập với Google</span>
                 </Button>
               </form>
             </Form>
-
             <p className="text-center text-sm text-gray-600">
-              Don’t have an account?{" "}
+              Bạn chưa có tài khoản?{" "}
               <Link
-                href="/register"
+                href="/auth/register"
                 className="font-semibold text-black-600 hover:underline"
               >
-                Sign Up
+                Tạo tài khoản ngay
               </Link>
             </p>
           </div>
         </div>
-        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-end justify-center bg-gray-100 rounded-r-2xl">
+        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-100 rounded-r-2xl">
           <Image
             src="/cover.png"
             alt="Login Illustration"

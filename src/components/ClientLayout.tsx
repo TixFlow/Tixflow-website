@@ -10,7 +10,7 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const authPages = ["/login", "/register", "/verify"];
+  const authPages = ["/auth/login", "/auth/register", "/auth/verify"];
   const isAuthPage = authPages.includes(pathname);
 
   return (

@@ -10,7 +10,11 @@ interface ButtonProps {
   className?: string;
 }
 
-export default function GradientButton({ children, onClick, className }: ButtonProps) {
+export default function GradientButton({
+  children,
+  onClick,
+  className,
+}: ButtonProps) {
   return (
     <Button
       onClick={onClick}
