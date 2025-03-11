@@ -149,7 +149,7 @@ const Register = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{label}</FormLabel>
-                        <div className="relative">
+                        <div className="relative ">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 scale-75">
                             {icon}
                           </span>
@@ -163,7 +163,7 @@ const Register = () => {
                                 : type
                             }
                             placeholder={`Enter your ${label.toLowerCase()}`}
-                            className="w-full pl-10 pr-8 py-2 border rounded-md"
+                            className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
                             disabled={loading}
                           />
                           {name.includes("password") && (

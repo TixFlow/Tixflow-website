@@ -107,7 +107,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>{label}</FormLabel>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center text-gray-500 w-4 h-4">
                             {icon}
                           </span>
                           <Input
@@ -120,7 +120,7 @@ export default function Login() {
                                 : type
                             }
                             placeholder={`Nhập ${label.toLowerCase()}`}
-                            className="w-full pl-10 pr-8 py-2 border rounded-md"
+                            className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
                           />
                           {name === "password" && (
                             <button

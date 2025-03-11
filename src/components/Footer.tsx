@@ -14,18 +14,18 @@ const FOOTER_LINKS = [
     title: "VỀ CHÚNG TÔI",
     links: [
       { text: "Trang chủ", href: "/" },
-      { text: "Về chúng tôi", href: "/about" },
+      { text: "Giới thiệu về chúng tôi", href: "/about" },
       { text: "Sự kiện sắp tới", href: "/events" },
-      { text: "Dịch vụ", href: "/services" },
+      { text: "Dịch vụ của chúng tôi", href: "/services" },
     ],
   },
   {
     title: "VỀ KHÁCH HÀNG",
     links: [
-      { text: "Services", href: "/services" },
-      { text: "Gallery", href: "/gallery" },
+      { text: "Dịch vụ", href: "/services" },
+      { text: "Phòng trưng bày", href: "/gallery" },
       { text: "FAQ", href: "/faq" },
-      { text: "Careers", href: "/careers" },
+      { text: "Nghề nghiệp", href: "/careers" },
     ],
   },
 ];
@@ -91,7 +91,7 @@ export default function Footer() {
             </h3>
             <input
               type="email"
-              placeholder="Your email"
+              placeholder="Email của bạn"
               className="w-full px-4 py-2 bg-transparent border-b border-gray-400 text-white focus:outline-none"
             />
             <button className="w-full bg-orange-400 text-black font-semibold py-3 mt-4 rounded-full hover:bg-orange-500 transition">
