@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone, MessageCircle } from "lucide-react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
-import Image from "next/image";
-import Logo from "./Logo";
+import Logo from "../Logo";
 
 const SOCIAL_LINKS = [
   { href: "#", icon: <FaFacebook size={22} />, label: "YouTube" },
@@ -38,10 +37,10 @@ const CONTACT_INFO = [
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-7">
+    <footer className="bg-black text-white">
       <div className="container mx-auto px-6">
-        <div className="flex justify-between items-center pb-6 border-b border-gray-700">
-          <Logo width={100} height={30} />
+        <div className="flex justify-between items-center border-b border-gray-700">
+          <Logo width={100} height={100} />
           <div className="flex gap-4">
             {SOCIAL_LINKS.map((social) => (
               <Link
@@ -100,8 +99,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="text-center text-gray-400 align-item-center">
-          © {new Date().getFullYear()} by Merkulove. All Rights Reserved.
+        <p className="text-center text-gray-400 align-item-center py-8">
+          Hệ thống quản lý và trao đổi vé sự kiện hàng đầu Việt Nam Tixflow ©{" "}
+          {new Date().getFullYear()}
         </p>
       </div>
     </footer>

@@ -1,6 +1,5 @@
 "use client";
 
-import AuthLayout from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,13 +21,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { registerUser, clearError } from "@/redux/features/authSlice";
+
 import { toast } from "sonner";
+import AuthLayout from "@/components/auth/AuthLayout";
 
 const formSchema = z
   .object({
@@ -64,46 +63,11 @@ const formFields: FormField[] = [
 ];
 
 const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    password: false,
+    confirmPassword: false,
   });
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      dispatch(clearError());
-    }
-  }, [error, dispatch]);
-
-  const togglePasswordVisibility = useCallback(() => {
-    setShowPassword((prev) => !prev);
-  }, []);
-
-  const onSubmit = async (values: FormValues) => {
-    try {
-      await dispatch(
-        registerUser({
-          name: values.name,
-          email: values.email,
-          password: values.password,
-        })
-      ).unwrap();
-
-      toast.success("Đăng ký thành công!");
-      form.reset();
-      router.push("/auth/login");
-    } catch (error) {
-      const errorMessage =
-        (error as { message: string }).message || "Đăng ký thất bại";
-      toast.error(errorMessage);
-    }
-  };
+  const router = useRouter();
 
   return (
     <AuthLayout>
@@ -112,30 +76,13 @@ const Register = () => {
         className="absolute top-5 left-5 flex items-center space-x-2 text-white font-semibold hover:underline"
       >
         <ArrowLeft size={20} />
-        <span>Back to Home</span>
+        <span>Về trang chủ</span>
       </Link>
 
       <div className="flex w-full">
         <div className="w-full lg:w-1/2 flex justify-center items-center p-10">
           <div className="max-w-md w-full space-y-6">
             <h1 className="text-3xl font-bold text-center">Tạo tài khoản</h1>
-
-            <Button
-              type="button"
-              className="w-full bg-white border border-black flex items-center justify-center gap-2 hover:bg-gray-100"
-              onClick={() => {
-                toast.info("Tính năng đang phát triển");
-              }}
-            >
-              <Image
-                src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                alt="Google"
-                width={20}
-                height={20}
-              />
-              <span className="text-black">Sign in with Google</span>
-            </Button>
-
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -156,10 +103,10 @@ const Register = () => {
                           <Input
                             {...field}
                             type={
-                              name.includes("password")
-                                ? showPassword
-                                  ? "text"
-                                  : "password"
+                              passwordVisibility[
+                                name as "password" | "confirmPassword"
+                              ]
+                                ? "text"
                                 : type
                             }
                             placeholder={`Enter your ${label.toLowerCase()}`}
@@ -170,10 +117,16 @@ const Register = () => {
                             <button
                               type="button"
                               className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                              onClick={togglePasswordVisibility}
+                              onClick={() =>
+                                togglePasswordVisibility(
+                                  name as "password" | "confirmPassword"
+                                )
+                              }
                               disabled={loading}
                             >
-                              {showPassword ? (
+                              {passwordVisibility[
+                                name as "password" | "confirmPassword"
+                              ] ? (
                                 <EyeOff size={16} />
                               ) : (
                                 <Eye size={16} />

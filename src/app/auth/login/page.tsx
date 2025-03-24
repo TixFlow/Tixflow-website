@@ -1,6 +1,6 @@
 "use client";
 
-import AuthLayout from "@/components/AuthLayout";
+import AuthLayout from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,6 +20,7 @@ import * as z from "zod";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
+// Schema validation
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
   password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự"),
@@ -27,17 +28,10 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-type FormField = {
-  name: keyof FormValues;
-  label: string;
-  icon: React.ReactNode;
-  type?: string;
-};
-
-const formFields: FormField[] = [
+const formFields = [
   { name: "email", label: "Email", icon: <Mail />, type: "email" },
   { name: "password", label: "Mật khẩu", icon: <Lock />, type: "password" },
-];
+] as const;
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -50,40 +44,44 @@ export default function Login() {
   });
 
   const togglePasswordVisibility = useCallback(() => {
-    setShowPassword((prev) => !prev);
+    try {
+      setShowPassword((prev) => !prev);
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái hiển thị mật khẩu:", error);
+    }
   }, []);
 
-  async function onSubmit(values: FormValues) {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
+  const onSubmit = useCallback(
+    async (values: FormValues) => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Đăng nhập thất bại!");
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.message || "Đăng nhập thất bại!");
+
+        Cookies.set("token", data.token, { expires: 7, secure: true });
+        router.push("/");
+        form.reset();
+      } catch (error) {
+        console.error("Lỗi đăng nhập:", (error as Error).message);
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.json();
-      Cookies.set("token", data.token, { expires: 7, secure: true });
-      router.push("/");
-      console.log("Đăng nhập thành công!", data);
-      form.reset();
-    } catch (error) {
-      console.error((error as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+    [router, form]
+  );
 
   return (
     <AuthLayout>
       <Link
         href="/"
-        className="absolute top-5 left-5 flex items-center space-x-2 text-white font-semibold hover:underline"
+        className="absolute top-5 left-5 flex items-center text-white font-semibold hover:underline"
       >
         <ArrowLeft size={20} />
         <span>Về trang chủ</span>
@@ -98,7 +96,7 @@ export default function Login() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                {formFields.map(({ name, label, icon, type = "text" }) => (
+                {formFields.map(({ name, label, icon, type }) => (
                   <FormField
                     key={name}
                     control={form.control}
@@ -107,25 +105,23 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>{label}</FormLabel>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center text-gray-500 w-4 h-4">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                             {icon}
                           </span>
                           <Input
                             {...field}
                             type={
-                              name === "password"
-                                ? showPassword
-                                  ? "text"
-                                  : "password"
+                              name === "password" && !showPassword
+                                ? "password"
                                 : type
                             }
                             placeholder={`Nhập ${label.toLowerCase()}`}
-                            className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
+                            className="w-full pl-10 pr-8 py-2 border rounded-md focus:ring-2 focus:ring-black"
                           />
                           {name === "password" && (
                             <button
                               type="button"
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                               onClick={togglePasswordVisibility}
                             >
                               {showPassword ? (
@@ -146,7 +142,7 @@ export default function Login() {
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 appearance-none border border-gray-400 rounded-full flex items-center justify-center checked:before:content-[''] checked:before:block checked:before:w-2 checked:before:h-2 checked:before:bg-black checked:before:rounded-full focus:ring-2 focus:ring-black-500"
+                      className="w-4 h-4 border border-gray-400 rounded focus:ring-2 focus:ring-black"
                     />
                     <span>Nhớ mật khẩu</span>
                   </label>
@@ -159,7 +155,7 @@ export default function Login() {
                 </div>
 
                 <Button
-                  className="w-full text-white py-2 rounded-md bg-gradient-to-r from-[#FDB777] to-[#FD9346] hover:from-[#FF7F50] hover:to-[#FF6200] transition-all"
+                  className="w-full bg-gradient-to-r from-[#FDB777] to-[#FD9346] text-white py-2 rounded-md transition-all"
                   disabled={loading}
                 >
                   {loading ? (
@@ -171,7 +167,7 @@ export default function Login() {
 
                 <Button
                   type="button"
-                  className="w-full bg-white border border-black text-gray-700 flex items-center justify-center gap-2 hover:bg-gray-100 hover:text-gray-700 active:bg-gray-200"
+                  className="w-full bg-white border border-black text-gray-700 flex items-center gap-2 hover:bg-gray-100"
                 >
                   <Image
                     src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
@@ -183,6 +179,7 @@ export default function Login() {
                 </Button>
               </form>
             </Form>
+
             <p className="text-center text-sm text-gray-600">
               Bạn chưa có tài khoản?{" "}
               <Link
@@ -194,6 +191,7 @@ export default function Login() {
             </p>
           </div>
         </div>
+
         <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-100 rounded-r-2xl">
           <Image
             src="/cover.png"

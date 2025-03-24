@@ -1,0 +1,222 @@
+{
+  "blogs": [
+    {
+      "id": 1,
+      "title": "Sự kiện âm nhạc hoành tráng sắp diễn ra!",
+      "imageUrl": "/images/blog1.jpg",
+      "category": "Sự kiện",
+      "content": "Đêm nhạc hoành tráng với sự góp mặt của nhiều nghệ sĩ nổi tiếng..."
+    },
+    {
+      "id": 2,
+      "title": "Kinh nghiệm săn vé giá rẻ cho concert",
+      "imageUrl": "/images/blog2.jpg",
+      "category": "Hướng dẫn",
+      "content": "Những bí kíp giúp bạn săn được vé concert giá tốt nhất..."
+    }
+  ],
+  "tickets": [
+       {
+      "id": "TIX001",
+      "event": "BlackPink World Tour",
+      "date": "2024-10-15",
+      "location": "Hà Nội",
+      "category": "Sự kiện giải trí",
+      "price": 2500000,
+      "status": "available",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX002",
+      "event": "Coldplay Music of the Spheres",
+      "date": "2024-12-01",
+       "category": "Sự kiện giải trí",
+      "location": "TP HCM",
+      "price": 3500000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX003",
+      "event": "Taylor Swift Eras Tour",
+      "date": "2024-11-05",
+       "category": "Sự kiện giải trí",
+      "location": "Đà Nẵng",
+      "price": 3000000,
+      "status": "available",
+      "imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX004",
+      "event": "Maroon 5 Live",
+      "date": "2024-08-20",
+       "category": "Workshop",
+      "location": "Hà Nội",
+      "price": 2800000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX005",
+      "event": "Ariana Grande Sweetener Tour",
+      "date": "2024-09-12",
+       "category": "Workshop",
+      "location": "TP HCM",
+      "price": 3200000,
+      "status": "available",
+      "imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+     {
+      "id": "TIX006",
+      "event": "BlackPink World Tour",
+      "date": "2024-10-15",
+      "location": "Hà Nội",
+      "category": "Sự kiện giải trí",
+      "price": 2500000,
+      "status": "available",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX007",
+      "event": "Coldplay Music of the Spheres",
+      "date": "2024-12-01",
+       "category": "Sự kiện giải trí",
+      "location": "TP HCM",
+      "price": 3500000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX008",
+      "event": "Taylor Swift Eras Tour",
+      "date": "2024-11-05",
+       "category": "Sự kiện giải trí",
+      "location": "Đà Nẵng",
+      "price": 3000000,
+      "status": "available",
+      "imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX009",
+      "event": "Maroon 5 Live",
+      "date": "2024-08-20",
+       "category": "Workshop",
+      "location": "Hà Nội",
+      "price": 2800000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    }, {
+      "id": "TIX0010",
+      "event": "BlackPink World Tour",
+      "date": "2024-10-15",
+      "location": "Hà Nội",
+      "category": "Sự kiện giải trí",
+      "price": 2500000,
+      "status": "available",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX011",
+      "event": "Coldplay Music of the Spheres",
+      "date": "2024-12-01",
+       "category": "Sự kiện giải trí",
+      "location": "TP HCM",
+      "price": 3500000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX012",
+      "event": "Taylor Swift Eras Tour",
+      "date": "2024-11-05",
+       "category": "Sự kiện giải trí",
+      "location": "Đà Nẵng",
+      "price": 3000000,
+      "status": "available",
+      "imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX013",
+      "event": "Maroon 5 Live",
+      "date": "2024-08-20",
+       "category": "Workshop",
+      "location": "Hà Nội",
+      "price": 2800000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    }, {
+      "id": "TIX0014",
+      "event": "BlackPink World Tour",
+      "date": "2024-10-15",
+      "location": "Hà Nội",
+      "category": "Sự kiện giải trí",
+      "price": 2500000,
+      "status": "available",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX0015",
+      "event": "Coldplay Music of the Spheres",
+      "date": "2024-12-01",
+       "category": "Sự kiện giải trí",
+      "location": "TP HCM",
+      "price": 3500000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX0016",
+      "event": "Taylor Swift Eras Tour",
+      "date": "2024-11-05",
+       "category": "Sự kiện giải trí",
+      "location": "Đà Nẵng",
+      "price": 3000000,
+      "status": "available",
+      "imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+    {
+      "id": "TIX0017",
+      "event": "Maroon 5 Live",
+      "date": "2024-08-20",
+       "category": "Workshop",
+      "location": "Hà Nội",
+      "price": 2800000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    },
+        {
+      "id": "TIX0018",
+      "event": "Maroon 5 Live",
+      "date": "2024-08-20",
+       "category": "Ca nhạc",
+      "location": "Hà Nội",
+      "price": 2800000,
+      "status": "sold",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk_svL5O7uuC549O3jvipYzZaUZ0nvod9oqA&s"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "nguyenvana",
+      "email": "nguyenvana@example.com",
+      "role": "customer"
+    },
+    {
+      "id": 2,
+      "username": "admin01",
+      "email": "admin@example.com",
+      "role": "admin"
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "ORD001",
+      "userId": 1,
+      "ticketId": "TIX001",
+      "quantity": 2,
+      "totalPrice": 5000000,
+      "status": "pending"
+    }
+  ]
+}

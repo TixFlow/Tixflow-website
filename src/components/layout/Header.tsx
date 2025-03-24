@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import Logo from "./Logo";
+import { Button } from "../ui/button";
+import Logo from "../Logo";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
-import SearchBar from "./SearchBar";
+import SearchBar from "../SearchBar";
 
 const NAV_ITEMS = [
   { href: "/tickets", label: "Đăng bán vé" },
@@ -33,14 +33,14 @@ export default function Header() {
   return (
     <header className="w-full bg-[#F6F6F6] dark:bg-gray-900">
       <div className="container flex mx-auto items-center justify-between p-2 my-3">
-        <Logo width={200} height={160} />
-
+        <Logo width={100} height={80} />
+        <SearchBar />
         <nav className="flex space-x-10">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="relative text-gray-700 dark:text-gray-300 hover:text-orange-500 transition duration-150 ease-in-out"
+              className="relative text-gray-700 font-bold dark:text-gray-300 hover:text-orange-500 transition duration-150 ease-in-out"
             >
               {item.label}
               {pathname === item.href && (
@@ -49,7 +49,6 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <SearchBar />
 
         <div className="flex items-center space-x-6">
           {SOCIAL_LINKS.map((link) => (

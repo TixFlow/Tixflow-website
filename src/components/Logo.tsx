@@ -11,16 +11,16 @@ type LogoProps = {
 const Logo: React.FC<LogoProps> = ({
   width = 100,
   height = 100,
-  className = "",
+  className,
 }) => {
   return (
     <Link href="/">
-      <div className={`relative ${className}`} style={{ width, height }}>
+      <div className={`relative ${className}`}>
         <Image
           src="/logo/logo.png"
-          alt="Logo"
-          sizes="(max-width: 768px) 100px, (max-width: 1200px) 150px, 200px"
-          fill
+          alt="TIXFLOW"
+          width={width}
+          height={height}
           priority
           className="object-contain"
         />
