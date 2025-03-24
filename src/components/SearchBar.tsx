@@ -1,26 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { useSearch } from "@/context/searchContext/searchContext";
 
 const SearchBar = () => {
   const router = useRouter();
-  const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    const savedSearch = localStorage.getItem("searchTerm");
-    if (savedSearch) setSearch(savedSearch);
-  }, []);
-
-  useEffect(() => {
-    if (search) localStorage.setItem("searchTerm", search);
-  }, [search]);
+  const { query, setQuery, applySearch } = useSearch();
 
   const handleSearch = () => {
-    if (search.trim() !== "") {
-      router.push(`/ticket?search=${encodeURIComponent(search)}`);
-    }
+    applySearch();
+
+    router.push(`/tickets?search=${encodeURIComponent(query.trim())}`);
   };
 
   return (
@@ -29,10 +20,9 @@ const SearchBar = () => {
       <input
         type="text"
         placeholder="Bạn tìm kiếm gì hôm nay?"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
         className="flex-grow px-2 py-2 text-gray-700 bg-transparent focus:outline-none"
-        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
       />
       <button
         type="button"

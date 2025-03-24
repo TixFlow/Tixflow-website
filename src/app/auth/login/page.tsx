@@ -20,7 +20,6 @@ import * as z from "zod";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-// Schema validation
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
   password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự"),

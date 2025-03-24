@@ -4,12 +4,21 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import Logo from "../Logo";
-import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaUser } from "react-icons/fa";
 import SearchBar from "../SearchBar";
+import { useEffect, useRef, useState } from "react";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const NAV_ITEMS = [
-  { href: "/tickets", label: "Đăng bán vé" },
-  { href: "/buy-tickets", label: "Mua vé" },
+  { href: "/tickets/legal-document", label: "Đăng bán vé" },
+  { href: "/tickets", label: "Mua vé" },
   { href: "/blogs", label: "Blogs sự kiện" },
 ];
 
@@ -29,9 +38,30 @@ const SOCIAL_LINKS = [
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowDropdown(false);
+    router.push("/");
+  };
   return (
-    <header className="w-full bg-[#F6F6F6] dark:bg-gray-900">
+    <header className="w-full bg-[#F6F6F6] dark:bg-gray-900 fixed top-0 z-50">
       <div className="container flex mx-auto items-center justify-between p-2 my-3">
         <Logo width={100} height={80} />
         <SearchBar />
@@ -63,12 +93,37 @@ export default function Header() {
             </a>
           ))}
 
-          <Button
-            className="flex items-center space-x-2 text-base rounded-3xl border border-black text-black bg-[#F6F6F6] hover:bg-gray-200"
-            onClick={() => router.push("/auth/login")}
-          >
-            <span>Đăng nhập</span>
-          </Button>
+          {!isAuthenticated ? (
+            <Button
+              className="flex items-center space-x-2 text-base rounded-3xl border border-black text-black bg-[#F6F6F6] hover:bg-gray-200"
+              onClick={() => router.push("/auth/login")}
+            >
+              <span>Đăng nhập</span>
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-100">
+                  <FaUser size={24} className="text-gray-700" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/my-tickets">Vé đã mua</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/our-tickets">Vé đăng bán</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/account">Tài khoản của tôi</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </header>

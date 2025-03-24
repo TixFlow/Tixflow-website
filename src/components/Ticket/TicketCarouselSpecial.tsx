@@ -2,19 +2,27 @@
 
 import React, { useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import { Ticket } from "@/models/Ticket";
 
-interface TicketCarouselProps {
+interface Ticket {
+  id: number;
+  image: string;
+  name: string;
+  price: string;
+  time: string;
+  category: string;
+}
+
+interface TicketCarouseSpeciallProps {
   tickets: Ticket[];
   title?: string;
 }
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 2;
 
-export default function TicketCarousel({
+export default function TicketCarouselSpecial({
   tickets,
   title = "Danh mục vé",
-}: TicketCarouselProps) {
+}: TicketCarouseSpeciallProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrev = () => {
@@ -35,11 +43,11 @@ export default function TicketCarousel({
   return (
     <div className="w-full p-10">
       <div className="flex items-center justify-center mb-6">
-        <div className="flex-grow h-px bg-black" />
+        <div className="flex-grow h-px bg-gray-300"></div>
         <h2 className="px-4 text-2xl font-bold whitespace-nowrap text-center">
           {title}
         </h2>
-        <div className="flex-grow h-px bg-black" />
+        <div className="flex-grow h-px bg-gray-300"></div>
       </div>
 
       <div className="relative">
@@ -50,7 +58,7 @@ export default function TicketCarousel({
           <ChevronLeft size={24} />
         </button>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mx-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mx-10">
           {visibleTickets.map((ticket) => (
             <div
               key={ticket.id}
@@ -58,17 +66,15 @@ export default function TicketCarousel({
             >
               <img
                 src={ticket.image}
-                alt={ticket.event}
-                className="w-full h-60 object-cover"
+                alt={ticket.name}
+                className="w-full h-100 object-cover"
               />
               <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-lg">{ticket.event}</h3>
-                <p className="text-red-600 font-bold">
-                  {ticket.price.toLocaleString()}đ
-                </p>
+                <h3 className="font-semibold text-lg">{ticket.name}</h3>
+                <p className="text-red-600 font-bold">{ticket.price}</p>
                 <p className="text-gray-500 text-sm flex gap-2 items-center">
                   <Calendar size={16} />
-                  {ticket.date}
+                  {ticket.time}
                 </p>
               </div>
             </div>
