@@ -9,6 +9,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { Ticket } from "@/models/Ticket";
 import { useSearch } from "@/context/searchContext/searchContext";
+import Link from "next/link";
 
 const statusMapping: Record<string, { text: string; className: string }> = {
   available: { text: "Còn hàng", className: "bg-green-100 text-green-800" },
@@ -139,7 +140,9 @@ export default function TicketList() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredTickets.map((ticket) => (
-          <TicketCard key={ticket.id} ticket={ticket} />
+          <Link key={ticket.id} href={`/tickets/${ticket.id}`}>
+            <TicketCard key={ticket.id} ticket={ticket} />
+          </Link>
         ))}
         {filteredTickets.length === 0 && (
           <div className="col-span-full text-center text-muted-foreground">

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Ticket } from "@/models/Ticket";
+import Link from "next/link";
 
 interface TicketCarouselProps {
   tickets: Ticket[];
@@ -52,26 +53,28 @@ export default function TicketCarousel({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mx-10">
           {visibleTickets.map((ticket) => (
-            <div
-              key={ticket.id}
-              className="bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition duration-300"
-            >
-              <img
-                src={ticket.image}
-                alt={ticket.event}
-                className="w-full h-60 object-cover"
-              />
-              <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-lg">{ticket.event}</h3>
-                <p className="text-red-600 font-bold">
-                  {ticket.price.toLocaleString()}đ
-                </p>
-                <p className="text-gray-500 text-sm flex gap-2 items-center">
-                  <Calendar size={16} />
-                  {ticket.date}
-                </p>
+            <Link key={ticket.id} href={`/tickets/${ticket.id}`}>
+              <div
+                key={ticket.id}
+                className="bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition duration-300"
+              >
+                <img
+                  src={ticket.image}
+                  alt={ticket.event}
+                  className="w-full h-60 object-cover"
+                />
+                <div className="p-4 space-y-2">
+                  <h3 className="font-semibold text-lg">{ticket.event}</h3>
+                  <p className="text-red-600 font-bold">
+                    {ticket.price.toLocaleString()}đ
+                  </p>
+                  <p className="text-gray-500 text-sm flex gap-2 items-center">
+                    <Calendar size={16} />
+                    {ticket.date}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
