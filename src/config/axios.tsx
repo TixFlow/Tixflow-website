@@ -17,7 +17,7 @@ const api = axios.create(config);
 const handleRequest = (
   config: InternalAxiosRequestConfig
 ): InternalAxiosRequestConfig => {
-  const token = Cookies.get("tokenn");
+  const token = Cookies.get("accessToken");
 
   if (token) {
     (config.headers as any).set("Authorization", `Bearer ${token}`);
@@ -35,6 +35,8 @@ const handleResponse = (response: AxiosResponse): AxiosResponse => {
 
 const handleResponseError = (error: AxiosError): Promise<AxiosError> => {
   if (error.response && error.response.status === 401) {
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
     window.location.href = "/login";
   }
   return Promise.reject(error);

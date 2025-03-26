@@ -1,12 +1,15 @@
 interface User {
   id: string;
-  name: string;
   email: string;
-  password: string;
-  confirmPassword: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   address: string;
-  role: string;
-  status: string;
   avatar: string;
+  reputation: number;
+  role: "admin" | "staff" | "customer";
+  gender: "male" | "female" | "other";
+  status: "verified" | "unverified";
+  createdAt: string;
+  updatedAt: string;
 }

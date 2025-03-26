@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   Eye,
@@ -21,20 +20,28 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AuthLayout from "@/components/auth/AuthLayout";
+import { RadioGroup } from "@/components/ui/radio-group";
+import { RadioGroupItem } from "@/components/ui/radio-group";
+
+import { toast } from "react-hot-toast";
+import api from "@/config/axios";
 
 const formSchema = z
   .object({
-    name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
+    firstName: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
+    lastName: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
     email: z.string().email("Email không hợp lệ"),
     password: z.string().min(6, "Mật khẩu ít nhất 6 ký tự"),
     confirmPassword: z.string(),
+    gender: z.enum(["male", "female", "other"], {
+      required_error: "Vui lòng chọn giới tính",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu xác nhận không khớp",
@@ -43,31 +50,69 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-type FormField = {
-  name: keyof FormValues;
-  label: string;
-  icon: React.ReactNode;
-  type?: string;
-};
-
-const formFields: FormField[] = [
-  { name: "name", label: "Name", icon: <User /> },
+const formFields = [
+  { name: "firstName", label: "Tên", icon: <User /> },
+  { name: "lastName", label: "Họ", icon: <User /> },
   { name: "email", label: "Email", icon: <Mail />, type: "email" },
-  { name: "password", label: "Password", icon: <Lock />, type: "password" },
+  { name: "password", label: "Mật khẩu", icon: <Lock />, type: "password" },
   {
     name: "confirmPassword",
-    label: "Confirm Password",
+    label: "Nhập lại mật khẩu",
     icon: <Lock />,
     type: "password",
   },
 ];
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
     confirmPassword: false,
   });
+
   const router = useRouter();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      gender: "male",
+    },
+  });
+
+  const togglePasswordVisibility = (field: "password" | "confirmPassword") => {
+    setPasswordVisibility((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setLoading(true);
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        gender: data.gender,
+      };
+
+      const res = await api.post("/api/auth/register", payload);
+
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      router.push("/auth/login");
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Đăng ký thất bại. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <AuthLayout>
@@ -83,6 +128,7 @@ const Register = () => {
         <div className="w-full lg:w-1/2 flex justify-center items-center p-10">
           <div className="max-w-md w-full space-y-6">
             <h1 className="text-3xl font-bold text-center">Tạo tài khoản</h1>
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -92,28 +138,31 @@ const Register = () => {
                   <FormField
                     key={name}
                     control={form.control}
-                    name={name}
+                    name={name as keyof FormValues}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{label}</FormLabel>
-                        <div className="relative ">
+                        <div className="relative">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 scale-75">
                             {icon}
                           </span>
                           <Input
                             {...field}
                             type={
-                              passwordVisibility[
-                                name as "password" | "confirmPassword"
-                              ]
-                                ? "text"
+                              name === "password" || name === "confirmPassword"
+                                ? passwordVisibility[
+                                    name as "password" | "confirmPassword"
+                                  ]
+                                  ? "text"
+                                  : type
                                 : type
                             }
-                            placeholder={`Enter your ${label.toLowerCase()}`}
+                            placeholder={`Nhập ${label.toLowerCase()} của bạn`}
                             className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
                             disabled={loading}
                           />
-                          {name.includes("password") && (
+                          {(name === "password" ||
+                            name === "confirmPassword") && (
                             <button
                               type="button"
                               className="absolute right-3 top-1/2 transform -translate-y-1/2"
@@ -139,6 +188,50 @@ const Register = () => {
                     )}
                   />
                 ))}
+
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Giới tính</FormLabel>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex gap-4"
+                      >
+                        <FormItem className="flex items-center gap-2">
+                          <RadioGroupItem value="male" id="male" />
+                          <FormLabel
+                            htmlFor="male"
+                            className="text-sm font-normal"
+                          >
+                            Nam
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center gap-2">
+                          <RadioGroupItem value="female" id="female" />
+                          <FormLabel
+                            htmlFor="female"
+                            className="text-sm font-normal"
+                          >
+                            Nữ
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center gap-2">
+                          <RadioGroupItem value="other" id="other" />
+                          <FormLabel
+                            htmlFor="other"
+                            className="text-sm font-normal"
+                          >
+                            Khác
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <Button
                   type="submit"
