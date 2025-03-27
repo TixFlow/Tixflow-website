@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
+
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -133,21 +133,6 @@ export default function TicketList() {
             >
               Xoá ngày lọc
             </button>
-          )}
-
-          {showCalendar && (
-            <div className="absolute right-0 mt-2 z-10">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date);
-                  setShowCalendar(false);
-                }}
-                className="rounded-md border"
-                locale={vi}
-              />
-            </div>
           )}
         </div>
       </div>
