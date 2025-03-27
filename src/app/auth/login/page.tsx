@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppDispatch } from "@/redux/hooks";
 import { loginUser } from "@/redux/authSlice";
 import toast from "react-hot-toast";
 
@@ -41,7 +41,6 @@ export default function Login() {
   const router = useRouter();
 
   const dispatch = useAppDispatch();
-  const auth = useAppSelector((state) => state.auth);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

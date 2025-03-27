@@ -113,11 +113,9 @@ const Register = () => {
       } else {
         toast.error(res.data.message || "Đăng ký thất bại. Vui lòng thử lại.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(
-        error?.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
-      );
+      toast.error("Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }

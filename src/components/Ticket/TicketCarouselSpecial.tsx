@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 interface Ticket {
   id: number;
@@ -64,10 +65,12 @@ export default function TicketCarouselSpecial({
               key={ticket.id}
               className="bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition duration-300"
             >
-              <img
+              <Image
                 src={ticket.image}
                 alt={ticket.name}
-                className="w-full h-100 object-cover"
+                width={400}
+                height={240}
+                className="w-full h-60 object-cover"
               />
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-lg">{ticket.name}</h3>

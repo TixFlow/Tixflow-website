@@ -19,9 +19,10 @@ const handleRequest = (
 ): InternalAxiosRequestConfig => {
   const token = Cookies.get("accessToken");
 
-  if (token) {
-    (config.headers as any).set("Authorization", `Bearer ${token}`);
+  if (token && config.headers) {
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
+
   return config;
 };
 

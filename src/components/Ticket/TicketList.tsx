@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -25,10 +25,14 @@ function TicketCard({ ticket }: TicketCardProps) {
   return (
     <Card className="overflow-hidden py-0">
       <div className="relative w-full aspect-[16/9]">
-        <img
+        <Image
           src={ticket.image}
           alt={ticket.event}
-          className="w-full h-40 object-cover"
+          fill
+          className="object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "/fallback.jpg";
+          }}
         />
       </div>
 
@@ -62,9 +66,7 @@ export default function TicketList() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [showCalendar, setShowCalendar] = useState(false);
-  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const { appliedQuery } = useSearch();
 
   useEffect(() => {
@@ -80,11 +82,7 @@ export default function TicketList() {
       });
   }, []);
 
-  useEffect(() => {
-    filterTickets();
-  }, [tickets, selectedDate, appliedQuery]);
-
-  const filterTickets = () => {
+  const filteredTickets = useMemo(() => {
     let result = [...tickets];
 
     if (appliedQuery && appliedQuery.trim() !== "") {
@@ -98,16 +96,22 @@ export default function TicketList() {
       result = result.filter((ticket) => ticket.date === selected);
     }
 
-    setFilteredTickets(result);
-  };
+    return result;
+  }, [tickets, selectedDate, appliedQuery]);
 
-  if (loading) return <p className="p-10">Đang tải dữ liệu...</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-lg text-gray-600">Đang tải dữ liệu vé...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
       {appliedQuery && appliedQuery.trim() !== "" && (
         <h2 className="text-2xl font-bold">
-          Kết quả tìm kiếm cho: "{appliedQuery}"
+          Kết quả tìm kiếm cho: &quot;{appliedQuery}&quot;
         </h2>
       )}
       <div className="flex justify-end">
@@ -122,6 +126,15 @@ export default function TicketList() {
               <CalendarIcon size={16} />
             )}
           </button>
+          {selectedDate && (
+            <button
+              onClick={() => setSelectedDate(undefined)}
+              className="ml-2 text-sm text-gray-600 underline"
+            >
+              Xoá ngày lọc
+            </button>
+          )}
+
           {showCalendar && (
             <div className="absolute right-0 mt-2 z-10">
               <Calendar

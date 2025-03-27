@@ -21,7 +21,8 @@ export default function Home() {
             </p>
             <p className="mb-2">
               Bạn đã từng mua vé mà không thể tham gia sự kiện? Hay bỏ lỡ một
-              show diễn chỉ vì vé đã "sold out"? Với Tixflow, bạn có thể:
+              show diễn chỉ vì vé đã &quot;sold out&quot;? Với Tixflow, bạn có
+              thể:
             </p>
             <ul className="list-disc pl-5 mb-2">
               <li>Đăng bán vé không dùng đến chỉ trong vài bước</li>

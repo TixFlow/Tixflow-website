@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Ticket } from "@/models/Ticket";
 import Link from "next/link";
+import Image from "next/image";
 
 interface TicketCarouselProps {
   tickets: Ticket[];
@@ -58,9 +59,11 @@ export default function TicketCarousel({
                 key={ticket.id}
                 className="bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition duration-300"
               >
-                <img
+                <Image
                   src={ticket.image}
                   alt={ticket.event}
+                  width={400}
+                  height={240}
                   className="w-full h-60 object-cover"
                 />
                 <div className="p-4 space-y-2">

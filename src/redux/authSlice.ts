@@ -30,7 +30,7 @@ export const fetchUserProfile = createAsyncThunk<
   try {
     const res = await api.get("auth/me");
     return res.data.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
     return thunkAPI.rejectWithValue("Không thể tải thông tin người dùng");
   }
 });
@@ -61,10 +61,8 @@ export const loginUser = createAsyncThunk<
       accessToken,
       refreshToken,
     };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || "Login failed"
-    );
+  } catch (error: unknown) {
+    return thunkAPI.rejectWithValue("Login failed");
   }
 });
 
@@ -84,10 +82,8 @@ export const registerUser = createAsyncThunk<
     return {
       user: response.data.data,
     };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      error.response.data.message || "Đăng ký thất bại"
-    );
+  } catch (error: unknown) {
+    return thunkAPI.rejectWithValue("Đăng ký thất bại");
   }
 });
 
@@ -103,9 +99,16 @@ const authSlice = createSlice({
       Cookies.remove("refreshToken");
       localStorage.removeItem("user");
     },
-    restoreLogin(state, action) {
-      state.accessToken = action.payload.accessToken;
-      state.user = action.payload.user;
+    restoreLogin(
+      state,
+      action: {
+        payload: { accessToken: string; refreshToken: string; user: User };
+      }
+    ) {
+      const { accessToken, refreshToken, user } = action.payload;
+      state.accessToken = accessToken;
+      state.refreshToken = refreshToken;
+      state.user = user;
       state.isAuthReady = true;
     },
   },
@@ -164,3 +167,5 @@ export default authSlice.reducer;
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>
   !!state.auth.accessToken;
+export const selectUserRole = (state: { auth: AuthState }) =>
+  state.auth.user?.role || null;
