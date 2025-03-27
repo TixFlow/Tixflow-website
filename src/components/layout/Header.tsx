@@ -42,7 +42,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, isAuthReady } = useAppSelector(selectAuth);
 

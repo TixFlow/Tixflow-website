@@ -30,7 +30,7 @@ export const fetchUserProfile = createAsyncThunk<
   try {
     const res = await api.get("auth/me");
     return res.data.data;
-  } catch (err: unknown) {
+  } catch (_err: unknown) {
     return thunkAPI.rejectWithValue("Không thể tải thông tin người dùng");
   }
 });
@@ -61,7 +61,7 @@ export const loginUser = createAsyncThunk<
       accessToken,
       refreshToken,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     return thunkAPI.rejectWithValue("Login failed");
   }
 });
@@ -82,7 +82,7 @@ export const registerUser = createAsyncThunk<
     return {
       user: response.data.data,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     return thunkAPI.rejectWithValue("Đăng ký thất bại");
   }
 });
