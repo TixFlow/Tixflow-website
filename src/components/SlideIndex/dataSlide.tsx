@@ -2,7 +2,10 @@ import { StaticImageData } from "next/image";
 import image1 from "../../../public/assets/slide/1.jpg";
 import image2 from "../../../public/assets/slide/2.jpg";
 import image3 from "../../../public/assets/slide/3.jpg";
-import image4 from "../../../public/assets/slide/4.png";
+import image4 from "../../../public/assets/slide/4.jpg";
+import image5 from "../../../public/assets/slide/5.jpg";
+import image6 from "../../../public/assets/slide/6.jpg";
+import image7 from "../../../public/assets/slide/7.jpg";
 
 interface SlideImage {
   src: StaticImageData;
@@ -29,6 +32,26 @@ const images: SlideImage[] = [
   {
     src: image4,
     title: "Bán vé đã mua? Chuyện nhỏ!",
+    description: "Không đi được? Đăng bán lại chỉ với vài cú click.",
+  },
+  {
+    src: image5,
+    title: "Vé hết? Luôn có người nhượng lại!",
+    description: "Chỉ cần tìm, là thấy ngay người có vé bạn cần.",
+  },
+  {
+    src: image6,
+    title: "Tixflow bảo vệ quyền lợi bạn",
+    description: "Cam kết minh bạch, hoàn tiền khi có vấn đề.",
+  },
+  {
+    src: image7,
+    title: "Trải nghiệm mượt mà – mọi lúc mọi nơi",
+    description: "Không đi được? Đăng bán lại chỉ với vài cú click.",
+  },
+  {
+    src: image4,
+    title: "Giao diện đơn giản, dùng dễ cả trên điện thoại và máy tính.",
     description: "Không đi được? Đăng bán lại chỉ với vài cú click.",
   },
 ];

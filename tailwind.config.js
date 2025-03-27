@@ -1,10 +1,16 @@
-/** @type {import('tailwindcss').Config} */
+const colors = require("tailwindcss/colors");
+
 module.exports = {
   content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: "#FCAE42",
+        secondary: "#3B3B3B",
+        neutral: colors.gray,
+      },
+      fontFamily: {
+        sans: ["var(--font-roboto)", "sans-serif"],
       },
     },
   },

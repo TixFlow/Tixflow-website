@@ -121,6 +121,9 @@
   body {
     @apply bg-background text-foreground;
   }
+     html {
+       font-family: 'Roboto', sans-serif;
+     }
 }
 
 @keyframes marquee {
@@ -139,4 +142,14 @@
   animation-name: marquee;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md bg-primary text-white hover:bg-orange-500;
+  }
+
+  .card {
+    @apply rounded-xl shadow-md p-4 bg-white;
+  }
 }

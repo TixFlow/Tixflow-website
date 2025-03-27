@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone, MessageCircle } from "lucide-react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
-import Logo from "../Logo";
+import Logo from "../logo/Logo";
 
 const SOCIAL_LINKS = [
   { href: "#", icon: <FaFacebook size={22} />, label: "YouTube" },

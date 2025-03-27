@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import Logo from "../Logo";
+import Logo from "../logo/Logo";
 import { FaFacebook, FaInstagram, FaUser } from "react-icons/fa";
 import SearchBar from "../SearchBar";
 import { useEffect, useRef, useState } from "react";

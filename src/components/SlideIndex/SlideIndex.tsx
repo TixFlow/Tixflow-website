@@ -30,6 +30,7 @@ export default function SlideIndex({ interval = 3000 }) {
               src={images[activeStep].src}
               alt={`Slide ${activeStep + 1}`}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
               className="object-cover"
             />
           </motion.div>
