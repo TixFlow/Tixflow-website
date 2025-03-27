@@ -102,7 +102,11 @@ const authSlice = createSlice({
     restoreLogin(
       state,
       action: {
-        payload: { accessToken: string; refreshToken: string; user: User };
+        payload: {
+          accessToken: string | null;
+          refreshToken: string | null;
+          user: User | null;
+        };
       }
     ) {
       const { accessToken, refreshToken, user } = action.payload;
