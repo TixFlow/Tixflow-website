@@ -17,8 +17,11 @@ import Link from "next/link";
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import Cookies from "js-cookie";
+
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { loginUser } from "@/redux/authSlice";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
@@ -37,6 +40,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "", password: "" },
@@ -54,26 +60,32 @@ export default function Login() {
     async (values: FormValues) => {
       setLoading(true);
       try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
+        const resultAction = await dispatch(loginUser(values));
 
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(data.message || "Đăng nhập thất bại!");
+        if (loginUser.fulfilled.match(resultAction)) {
+          const { accessToken, user } = resultAction.payload;
 
-        Cookies.set("token", data.token, { expires: 7, secure: true });
-        router.push("/");
-        form.reset();
+          if (accessToken && user) {
+            toast.success("Đăng nhập thành công!");
+            console.log("Access Token:", accessToken);
+            console.log("User:", user);
+            router.push("/");
+            form.reset();
+          } else {
+            toast.error("Thiếu thông tin đăng nhập. Vui lòng thử lại.");
+          }
+        } else {
+          toast.error("Email hoặc mật khẩu không đúng!");
+          console.error("Đăng nhập thất bại:", resultAction.payload);
+        }
       } catch (error) {
-        console.error("Lỗi đăng nhập:", (error as Error).message);
+        toast.error("Đã xảy ra lỗi khi đăng nhập.");
+        console.error("Lỗi đăng nhập:", error);
       } finally {
         setLoading(false);
       }
     },
-    [router, form]
+    [dispatch, form, router]
   );
 
   return (
@@ -110,8 +122,10 @@ export default function Login() {
                           <Input
                             {...field}
                             type={
-                              name === "password" && !showPassword
-                                ? "password"
+                              name === "password"
+                                ? showPassword
+                                  ? "text"
+                                  : "password"
                                 : type
                             }
                             placeholder={`Nhập ${label.toLowerCase()}`}

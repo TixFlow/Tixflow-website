@@ -1,6 +1,7 @@
 export interface Ticket {
   id: string;
   event: string;
+  info: string;
   date: string;
   location: string;
   price: number;
@@ -9,6 +10,6 @@ export interface Ticket {
   featured: boolean;
   trending: boolean;
   special: boolean;
-  status: "available" | "pending" | "soldout";
+  status: string;
   category: string;
 }

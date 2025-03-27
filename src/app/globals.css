@@ -133,3 +133,10 @@
   }
 }
 
+.animate-marquee {
+  white-space: nowrap;
+  display: inline-block;
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}

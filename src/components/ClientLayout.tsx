@@ -16,7 +16,7 @@ export default function ClientLayout({
   return (
     <div className="flex flex-col min-h-screen">
       {!isAuthPage && <Header />}
-      <main key={pathname} className={`flex-1 ${!isAuthPage ? "pt-34" : ""}`}>
+      <main key={pathname} className={`flex-1 ${!isAuthPage ? "pt-28" : ""}`}>
         {children}
       </main>
       {!isAuthPage && <Footer />}

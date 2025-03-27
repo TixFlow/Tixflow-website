@@ -26,8 +26,8 @@ export default function LegalDocumentPage() {
 
 function LegalDocumentHeader() {
   return (
-    <section className="text-center py-10 bg-white">
-      <h1 className="text-4xl font-bold uppercase">Điều Khoản</h1>
+    <section className="text-center py-5 bg-white">
+      <h1 className="text-3xl font-bold uppercase">Điều Khoản</h1>
     </section>
   );
 }
@@ -59,9 +59,9 @@ function ProcessStepsSection() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         {steps.map((step, index) => (
           <div key={index} className="space-y-4">
-            <step.Icon size={80} className="mx-auto text-orange-500" />
-            <h3 className="text-xl font-semibold">{step.title}</h3>
-            <p className="text-gray-600">{step.description}</p>
+            <step.Icon size={70} className="mx-auto text-orange-500" />
+            <h3 className="text-base font-semibold">{step.title}</h3>
+            <p className="text-gray-600 text-sm">{step.description}</p>
           </div>
         ))}
       </div>
@@ -71,12 +71,12 @@ function ProcessStepsSection() {
 
 function EventScheduleSection() {
   return (
-    <section className="bg-black text-white py-4">
+    <section className="bg-black text-white py-2 overflow-hidden h-[40px]">
       <div className="max-w-full text-center">
         <AutoScrollingText
-          text="Tixflow - Săn vé ngay - Nhận vé liền tay"
+          text="🔥 Tixflow - Săn vé ngay - Nhận vé liền tay 🔥"
           speed={15}
-          className=""
+          className="text-xl font-semibold text-yellow-400"
         />
       </div>
     </section>
@@ -112,7 +112,7 @@ function CommitmentSection() {
   ];
 
   return (
-    <section className="max-w-full mx-20 md:px-8 py-10">
+    <section className="max-w-full mx-20 md:px-8 py-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="grid grid-cols-2 gap-4">
           {commitments.map((commit, index) => (
@@ -120,19 +120,19 @@ function CommitmentSection() {
               key={index}
               className="flex flex-col items-center space-y-3 p-4 rounded-lg shadow hover:shadow-lg transition"
             >
-              <commit.Icon size={48} className="text-gray-700" />
-              <h4 className="text-lg font-semibold">{commit.title}</h4>
-              <p className="text-center text-gray-600 text-sm px-2 text-justify">
+              <commit.Icon size={44} className="text-gray-700" />
+              <h4 className="text-sm font-semibold">{commit.title}</h4>
+              <p className="text-center text-gray-600 text-xs px-2 text-justify">
                 {commit.description}
               </p>
             </div>
           ))}
         </div>
         <div className="flex flex-col justify-center">
-          <h2 className="text-center text-3xl font-bold mb-6">
+          <h2 className="text-center text-2xl font-bold mb-6">
             Cam Kết Của Chúng Tôi
           </h2>
-          <p className="text-gray-800 text-xl text-justify mx-10">
+          <p className="text-gray-800 text-base text-justify mx-10">
             Chúng tôi cam kết bảo mật giao dịch, thanh toán nhanh chóng và hỗ
             trợ khách hàng 24/7. Tất cả các dịch vụ của chúng tôi được thiết kế
             để mang lại trải nghiệm tốt nhất cho người dùng.
@@ -142,7 +142,7 @@ function CommitmentSection() {
               onClick={handleUnderstood}
               className="bg-orange-400 text-white px-6 py-3 rounded-full font-semibold hover:brightness-95 transition"
             >
-              Đăng Vé Bán
+              Đăng bán vé ngay !!!
             </button>
           </div>
         </div>

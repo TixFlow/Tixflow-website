@@ -15,6 +15,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { logout, selectAuth } from "@/redux/authSlice";
+import { useAppSelector } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
 
 const NAV_ITEMS = [
   { href: "/tickets/legal-document", label: "Đăng bán vé" },
@@ -38,9 +41,10 @@ const SOCIAL_LINKS = [
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const dispatch = useDispatch();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, isAuthReady } = useAppSelector(selectAuth);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,14 +59,17 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setShowDropdown(false);
-    router.push("/");
-  };
+  if (!isAuthReady) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        Đang tải...
+      </div>
+    );
+  }
+
   return (
     <header className="w-full bg-[#F6F6F6] dark:bg-gray-900 fixed top-0 z-50">
-      <div className="container flex mx-auto items-center justify-between p-2 my-3">
+      <div className="container flex mx-auto items-center justify-between p-2">
         <Logo width={100} height={80} />
         <SearchBar />
         <nav className="flex space-x-10">
@@ -70,7 +77,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="relative text-gray-700 font-bold dark:text-gray-300 hover:text-orange-500 transition duration-150 ease-in-out"
+              className="relative text-gray-700 font-bold text-sm dark:text-gray-300 hover:text-orange-500 transition duration-150 ease-in-out"
             >
               {item.label}
               {pathname === item.href && (
@@ -93,7 +100,7 @@ export default function Header() {
             </a>
           ))}
 
-          {!isAuthenticated ? (
+          {!user ? (
             <Button
               className="flex items-center space-x-2 text-base rounded-3xl border border-black text-black bg-[#F6F6F6] hover:bg-gray-200"
               onClick={() => router.push("/auth/login")}
@@ -103,10 +110,14 @@ export default function Header() {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-100">
-                  <FaUser size={24} className="text-gray-700" />
+                <button className="p-2 px-3 rounded-full border border-gray-300 hover:bg-gray-100 flex items-center gap-2">
+                  <FaUser size={20} className="text-gray-700" />
+                  <span className="text-sm font-medium text-gray-700">
+                    {user?.lastName} {user?.firstName || "Người dùng"}
+                  </span>
                 </button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent className="w-48">
                 <DropdownMenuItem asChild>
                   <Link href="/my-tickets">Vé đã mua</Link>
@@ -118,7 +129,7 @@ export default function Header() {
                   <Link href="/account">Tài khoản của tôi</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={handleLogout}>
+                <DropdownMenuItem onClick={() => dispatch(logout())}>
                   Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -10,6 +10,7 @@ interface AuthState {
   refreshToken: string | null;
   loading: boolean;
   error: string | null;
+  isAuthReady: boolean;
 }
 
 const initialState: AuthState = {
@@ -18,6 +19,7 @@ const initialState: AuthState = {
   refreshToken: null,
   loading: false,
   error: null,
+  isAuthReady: false,
 };
 
 export const fetchUserProfile = createAsyncThunk<
@@ -26,7 +28,7 @@ export const fetchUserProfile = createAsyncThunk<
   { rejectValue: string }
 >("auth/fetchUserProfile", async (_, thunkAPI) => {
   try {
-    const res = await api.get("/api/auth/me");
+    const res = await api.get("auth/me");
     return res.data.data;
   } catch (err: any) {
     return thunkAPI.rejectWithValue("Không thể tải thông tin người dùng");
@@ -39,19 +41,20 @@ export const loginUser = createAsyncThunk<
   { rejectValue: string }
 >("auth/login", async (formData, thunkAPI) => {
   try {
-    const response = await api.post("/api/auth/login", formData);
+    const response = await api.post("/auth/login", formData);
 
     const { accessToken, refreshToken } = response.data.data;
 
     Cookies.set("accessToken", accessToken, {
       expires: 1,
-      secure: true,
     });
     Cookies.set("refreshToken", refreshToken, {
       expires: 7,
     });
 
-    const userResponse = await api.get("/api/auth/me");
+    const userResponse = await api.get("/auth/me");
+
+    localStorage.setItem("user", JSON.stringify(userResponse.data.data));
 
     return {
       user: userResponse.data.data,
@@ -77,7 +80,7 @@ export const registerUser = createAsyncThunk<
   { rejectValue: string }
 >("auth/register", async (formData, thunkAPI) => {
   try {
-    const response = await api.post("/api/auth/register", formData);
+    const response = await api.post("/auth/register", formData);
     return {
       user: response.data.data,
     };
@@ -98,6 +101,12 @@ const authSlice = createSlice({
       state.refreshToken = null;
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
+      localStorage.removeItem("user");
+    },
+    restoreLogin(state, action) {
+      state.accessToken = action.payload.accessToken;
+      state.user = action.payload.user;
+      state.isAuthReady = true;
     },
   },
   extraReducers: (builder) => {
@@ -112,10 +121,12 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
+        state.isAuthReady = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Đăng nhập thất bại";
+        state.isAuthReady = true;
       })
 
       .addCase(registerUser.pending, (state) => {
@@ -138,15 +149,17 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.isAuthReady = true;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Tải thông tin thất bại";
+        state.isAuthReady = true;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, restoreLogin } = authSlice.actions;
 export default authSlice.reducer;
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>

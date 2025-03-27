@@ -14,15 +14,18 @@ export default function AutoScrollingText({
   className = "",
 }: AutoScrollingTextProps) {
   return (
-    <div className={`overflow-hidden whitespace-nowgrap ${className}`}>
-      <p
-        className="marquee-inner"
-        style={{ animation: `marquee ${speed}s linear infinite` }}
+    <div className={`overflow-hidden whitespace-nowgap ${className}`}>
+      <div
+        className="inline-block animate-marquee"
+        style={{
+          animationDuration: `${speed}s`,
+        }}
       >
-        <span>{text}</span>
-
-        <span className="mx-20  ">{text}</span>
-      </p>
+        <span className="mx-20">{text}</span>
+        <span className="mx-20">{text}</span>
+        <span className="mx-20">{text}</span>
+        <span className="mx-20">{text}</span>
+      </div>
     </div>
   );
 }

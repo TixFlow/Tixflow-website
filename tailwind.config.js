@@ -12,5 +12,6 @@ module.exports = {
     require("tailwindcss-animate"),
     require("@tailwindcss/aspect-ratio"),
     require("@tailwindcss/line-clamp"),
+    require("tailwind-scrollbar-hide"),
   ],
 };

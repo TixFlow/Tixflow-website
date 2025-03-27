@@ -58,12 +58,15 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mt-6">
           {FOOTER_LINKS.map((section) => (
             <div key={section.title}>
-              <h3 className="font-semibold text-[#FCAE42] mb-4">
+              <h3 className="font-semibold text-base text-[#FCAE42] mb-4">
                 {section.title}
               </h3>
               <ul>
                 {section.links.map((link) => (
-                  <li key={link.text} className="mb-2 hover:text-gray-400">
+                  <li
+                    key={link.text}
+                    className="mb-2 text-ms hover:text-gray-400"
+                  >
                     <Link href={link.href}>{link.text}</Link>
                   </li>
                 ))}
@@ -72,12 +75,12 @@ export default function Footer() {
           ))}
 
           <div>
-            <h3 className="font-semibold text-[#FCAE42] mb-4">
+            <h3 className="font-semibold text-base text-[#FCAE42] mb-4">
               LIÊN HỆ CHÚNG TÔI
             </h3>
             <ul>
               {CONTACT_INFO.map((info, idx) => (
-                <li key={idx} className="flex items-center gap-2 mb-2">
+                <li key={idx} className="flex text-sm items-center gap-2 mb-2">
                   {info.icon} <span>{info.text}</span>
                 </li>
               ))}
@@ -91,7 +94,7 @@ export default function Footer() {
             <input
               type="email"
               placeholder="Email của bạn"
-              className="w-full px-4 py-2 bg-transparent border-b border-gray-400 text-white focus:outline-none"
+              className="w-full px-4 py-2 text-sm bg-transparent border-b border-gray-400 text-white focus:outline-none"
             />
             <button className="w-full bg-orange-400 text-black font-semibold py-3 mt-4 rounded-full hover:bg-orange-500 transition">
               Subscribe
@@ -99,7 +102,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="text-center text-gray-400 align-item-center py-8">
+        <p className="text-center text-sm text-gray-400 align-item-center py-8">
           Hệ thống quản lý và trao đổi vé sự kiện hàng đầu Việt Nam Tixflow ©{" "}
           {new Date().getFullYear()}
         </p>

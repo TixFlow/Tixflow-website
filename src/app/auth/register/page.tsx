@@ -31,6 +31,7 @@ import { RadioGroupItem } from "@/components/ui/radio-group";
 
 import { toast } from "react-hot-toast";
 import api from "@/config/axios";
+import TicketLoading from "@/components/loading/loading";
 
 const formSchema = z
   .object({
@@ -102,13 +103,21 @@ const Register = () => {
         gender: data.gender,
       };
 
-      const res = await api.post("/api/auth/register", payload);
+      const res = await api.post("/auth/register", payload);
 
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
-      router.push("/auth/login");
+      if (res.data.status === 200 || res.data.status === 201) {
+        toast.success(res.data.message || "Đăng ký thành công!");
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 1500);
+      } else {
+        toast.error(res.data.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      }
     } catch (error: any) {
       console.error(error);
-      toast.error("Đăng ký thất bại. Vui lòng thử lại.");
+      toast.error(
+        error?.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -128,127 +137,131 @@ const Register = () => {
         <div className="w-full lg:w-1/2 flex justify-center items-center p-10">
           <div className="max-w-md w-full space-y-6">
             <h1 className="text-3xl font-bold text-center">Tạo tài khoản</h1>
+            {loading ? (
+              <TicketLoading />
+            ) : (
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  {formFields.map(({ name, label, icon, type = "text" }) => (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name as keyof FormValues}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{label}</FormLabel>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 scale-75">
+                              {icon}
+                            </span>
+                            <Input
+                              {...field}
+                              type={
+                                name === "password" ||
+                                name === "confirmPassword"
+                                  ? passwordVisibility[
+                                      name as "password" | "confirmPassword"
+                                    ]
+                                    ? "text"
+                                    : type
+                                  : type
+                              }
+                              placeholder={`Nhập ${label.toLowerCase()} của bạn`}
+                              className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
+                              disabled={loading}
+                            />
+                            {(name === "password" ||
+                              name === "confirmPassword") && (
+                              <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                                onClick={() =>
+                                  togglePasswordVisibility(
+                                    name as "password" | "confirmPassword"
+                                  )
+                                }
+                                disabled={loading}
+                              >
+                                {passwordVisibility[
+                                  name as "password" | "confirmPassword"
+                                ] ? (
+                                  <EyeOff size={16} />
+                                ) : (
+                                  <Eye size={16} />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                {formFields.map(({ name, label, icon, type = "text" }) => (
                   <FormField
-                    key={name}
                     control={form.control}
-                    name={name as keyof FormValues}
+                    name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{label}</FormLabel>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 scale-75">
-                            {icon}
-                          </span>
-                          <Input
-                            {...field}
-                            type={
-                              name === "password" || name === "confirmPassword"
-                                ? passwordVisibility[
-                                    name as "password" | "confirmPassword"
-                                  ]
-                                  ? "text"
-                                  : type
-                                : type
-                            }
-                            placeholder={`Nhập ${label.toLowerCase()} của bạn`}
-                            className="w-full pl-10 pr-8 py-2 border border-black rounded-md"
-                            disabled={loading}
-                          />
-                          {(name === "password" ||
-                            name === "confirmPassword") && (
-                            <button
-                              type="button"
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                              onClick={() =>
-                                togglePasswordVisibility(
-                                  name as "password" | "confirmPassword"
-                                )
-                              }
-                              disabled={loading}
+                        <FormLabel>Giới tính</FormLabel>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex gap-4"
+                        >
+                          <FormItem className="flex items-center gap-2">
+                            <RadioGroupItem value="male" id="male" />
+                            <FormLabel
+                              htmlFor="male"
+                              className="text-sm font-normal"
                             >
-                              {passwordVisibility[
-                                name as "password" | "confirmPassword"
-                              ] ? (
-                                <EyeOff size={16} />
-                              ) : (
-                                <Eye size={16} />
-                              )}
-                            </button>
-                          )}
-                        </div>
+                              Nam
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center gap-2">
+                            <RadioGroupItem value="female" id="female" />
+                            <FormLabel
+                              htmlFor="female"
+                              className="text-sm font-normal"
+                            >
+                              Nữ
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center gap-2">
+                            <RadioGroupItem value="other" id="other" />
+                            <FormLabel
+                              htmlFor="other"
+                              className="text-sm font-normal"
+                            >
+                              Khác
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                ))}
 
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Giới tính</FormLabel>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex gap-4"
-                      >
-                        <FormItem className="flex items-center gap-2">
-                          <RadioGroupItem value="male" id="male" />
-                          <FormLabel
-                            htmlFor="male"
-                            className="text-sm font-normal"
-                          >
-                            Nam
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center gap-2">
-                          <RadioGroupItem value="female" id="female" />
-                          <FormLabel
-                            htmlFor="female"
-                            className="text-sm font-normal"
-                          >
-                            Nữ
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center gap-2">
-                          <RadioGroupItem value="other" id="other" />
-                          <FormLabel
-                            htmlFor="other"
-                            className="text-sm font-normal"
-                          >
-                            Khác
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full text-white py-2 rounded-md hover:bg-blue-700 transition"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Đang đăng ký...</span>
-                    </div>
-                  ) : (
-                    "Đăng ký"
-                  )}
-                </Button>
-              </form>
-            </Form>
+                  <Button
+                    type="submit"
+                    className="w-full text-white py-2 rounded-md hover:bg-blue-700 transition"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang đăng ký...</span>
+                      </div>
+                    ) : (
+                      "Đăng ký"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            )}
 
             <p className="text-center text-sm text-gray-600">
               Bạn đã có tài khoản?{" "}
