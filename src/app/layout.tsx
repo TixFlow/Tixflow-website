@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import AppProviders from "@/components/AppProviders";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/AuthProvider";
+import MobileWrapper from "@/components/mobile/MobileWrapper";
 
 export const metadata: Metadata = {
   title: "Tixflow",
@@ -23,13 +24,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" className={roboto.className}>
       <body>
-        <AppProviders>
-          <AuthProvider>
-            <ClientLayout>
-              {children} <Toaster position="top-right" reverseOrder={false} />
-            </ClientLayout>
-          </AuthProvider>
-        </AppProviders>
+        <MobileWrapper>
+          <AppProviders>
+            <AuthProvider>
+              <ClientLayout>
+                {children} <Toaster position="top-right" reverseOrder={false} />
+              </ClientLayout>
+            </AuthProvider>
+          </AppProviders>
+        </MobileWrapper>
       </body>
     </html>
   );

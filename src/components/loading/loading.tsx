@@ -1,35 +1,45 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+"use client";
 
-const TicketLoading = () => {
+import { motion } from "framer-motion";
+import Image from "next/image";
+import React from "react";
+
+interface TicketLoadingProps {
+  message?: string;
+  height?: string;
+  gifSrc?: string;
+}
+
+export default function TicketLoading({
+  message = "Đang tải vé, vui lòng đợi...",
+  height = "h-full",
+  gifSrc = "/loading.gif",
+}: TicketLoadingProps) {
   return (
-    <div className="flex flex-col items-center gap-6 p-6">
-      {[...Array(3)].map((_, index) => (
-        <Card key={index} className="w-96 h-28 shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <motion.div
-              className="w-20 h-20 bg-gray-200 rounded-md skeleton"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-            <div className="flex-1 space-y-2">
-              <motion.div
-                className="h-5 w-3/4 bg-gray-200 rounded skeleton"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-              <motion.div
-                className="h-4 w-1/2 bg-gray-200 rounded skeleton"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div
+      className={`w-full ${height} flex flex-col items-center justify-center py-10 space-y-4`}
+    >
+      <motion.div
+        className="w-20 h-20 flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0.2, 1, 0.2] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        <Image
+          src={gifSrc}
+          alt="Loading..."
+          width={80}
+          height={80}
+          className="object-contain"
+          priority
+        />
+      </motion.div>
+
+      {message && (
+        <p className="text-center text-sm text-gray-500 animate-pulse">
+          {message}
+        </p>
+      )}
     </div>
   );
-};
-
-export default TicketLoading;
+}

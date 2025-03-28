@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/redux/hooks";
 import { loginUser } from "@/redux/authSlice";
 import toast from "react-hot-toast";
+import TicketLoading from "@/components/loading/loading";
 
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
@@ -39,6 +40,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -167,11 +169,11 @@ export default function Login() {
                 </div>
 
                 <Button
-                  className="w-full bg-gradient-to-r from-[#FDB777] to-[#FD9346] text-white py-2 rounded-md transition-all"
+                  className="w-full bg-gradient-to-r from-[#FDB777] to-[#FD9346] text-white py-2 rounded-md transition-all duration-300 hover:brightness-110"
                   disabled={loading}
                 >
                   {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="animate-spin w-5 h-5" />
                   ) : (
                     "Tiếp tục"
                   )}
@@ -204,14 +206,26 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-100 rounded-r-2xl">
+        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-100 rounded-r-2xl relative overflow-hidden">
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
+              imageLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
+          >
+            <TicketLoading />
+          </div>
+
           <Image
             src="/cover.png"
             alt="Login Illustration"
             width={500}
             height={500}
             priority
-            className="object-cover max-w-full h-auto rounded-r-2xl"
+            loading="eager"
+            onLoad={() => setImageLoaded(true)}
+            className={`object-cover rounded-r-2xl transition-opacity duration-500 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
           />
         </div>
       </div>
