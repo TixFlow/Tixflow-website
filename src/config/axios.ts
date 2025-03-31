@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 import { API_URL } from "../constants/index";
 import Cookies from "js-cookie";
-
+console.log("API_URL", API_URL);
 const config: AxiosRequestConfig = {
   baseURL: API_URL,
   timeout: 30000,

@@ -1,0 +1,38 @@
+name: Deploy on VPS
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  docker-compose:
+    runs-on: tixflow
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up envỉonment variables
+      - name: Set up environment variables
+        run: |
+          echo "${{ secrets.PRODUCTION_ENV }}" >> .env
+
+      # Step 3: Remove existing containers
+      - name: Remove existing containers
+        run: |
+          docker compose down 
+        shell: bash
+
+      # Step 4: Build and run the containers
+      - name: Build and run containers
+        run: |
+          docker compose up -d --build
+        shell: bash
+
+      # Step 5: Remove unsed images
+      - name: Remove unused images
+        run: |
+          docker image prune -f -a
+        shell: bash
