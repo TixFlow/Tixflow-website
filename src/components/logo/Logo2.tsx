@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "../../../public/logo/logo2.png";
 
 type LogoProps = {
   width?: number;
@@ -17,7 +18,7 @@ const Logo2: React.FC<LogoProps> = ({
     <Link href="/">
       <div className={`relative ${className}`}>
         <Image
-          src="/logo/logo2.png"
+          src={logo}
           alt="TIXFLOW"
           width={width}
           height={height}

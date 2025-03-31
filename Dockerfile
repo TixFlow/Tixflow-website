@@ -40,11 +40,16 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci
 
+
+
 # Copy the rest of the source files into the image.
 COPY . .
+COPY public ./public
 # Run the build script.
 RUN npm run build
-
+USER root
+RUN chown -R node:node ./.next
+USER node
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
