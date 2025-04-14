@@ -68,8 +68,6 @@ export default function Login() {
 
           if (accessToken && user) {
             toast.success("Đăng nhập thành công!");
-            console.log("Access Token:", accessToken);
-            console.log("User:", user);
             router.push("/");
             form.reset();
           } else {
@@ -77,11 +75,9 @@ export default function Login() {
           }
         } else {
           toast.error("Email hoặc mật khẩu không đúng!");
-          console.error("Đăng nhập thất bại:", resultAction.payload);
         }
       } catch (error) {
         toast.error("Đã xảy ra lỗi khi đăng nhập.");
-        console.error("Lỗi đăng nhập:", error);
       } finally {
         setLoading(false);
       }

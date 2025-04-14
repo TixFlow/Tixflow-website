@@ -7,9 +7,9 @@ interface User {
   address: string;
   avatar: string;
   reputation: number;
-  role: "admin" | "staff" | "customer";
-  gender: "male" | "female" | "other";
-  status: "verified" | "unverified";
+  role: string;
+  gender: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -120,13 +120,13 @@ export default function Header() {
 
               <DropdownMenuContent className="w-48">
                 <DropdownMenuItem asChild>
-                  <Link href="/my-tickets">Vé đã mua</Link>
+                  <Link href="/account/my-tickets">Vé đã mua</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/our-tickets">Vé đăng bán</Link>
+                  <Link href="/account/our-tickets">Vé đăng bán</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/account">Tài khoản của tôi</Link>
+                  <Link href="/account/profile">Tài khoản của tôi</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => dispatch(logout())}>
