@@ -30,6 +30,7 @@ export const fetchUserProfile = createAsyncThunk<
   try {
     const res = await api.get("auth/me");
     return res.data.data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err: unknown) {
     return thunkAPI.rejectWithValue("Không thể tải thông tin người dùng");
   }
@@ -61,6 +62,7 @@ export const loginUser = createAsyncThunk<
       accessToken,
       refreshToken,
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_error: unknown) {
     return thunkAPI.rejectWithValue("Login failed");
   }
@@ -82,6 +84,7 @@ export const registerUser = createAsyncThunk<
     return {
       user: response.data.data,
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_error: unknown) {
     return thunkAPI.rejectWithValue("Đăng ký thất bại");
   }

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       "cdn-images.vtv.vn",
       "giadinh.mediacdn.vn",
       "https://kenh14cdn.com",
+      "firebasestorage.googleapis.com",
     ],
     remotePatterns: [
       {
