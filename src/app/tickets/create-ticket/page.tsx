@@ -377,7 +377,7 @@ export default function CreateTicketPage() {
     setIsCreatingOrder(true);
     try {
       const total = fee * ticketData.quantity;
-      const res = await api.post("/order", {
+      const res = await api.post("/orders", {
         ticketId,
         type: "sell_ticket",
         price: total,
