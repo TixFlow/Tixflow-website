@@ -32,6 +32,7 @@ import { RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "react-hot-toast";
 import api from "@/config/axios";
 import TicketLoading from "@/components/loading/loading";
+import coverImage from "@/assets/cover.png";
 
 const formSchema = z
   .object({
@@ -275,7 +276,7 @@ const Register = () => {
 
         <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-100 rounded-r-2xl">
           <Image
-            src="/cover.png"
+            src={coverImage}
             alt="Login Illustration"
             width={500}
             height={500}

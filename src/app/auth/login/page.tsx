@@ -23,6 +23,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { loginUser } from "@/redux/authSlice";
 import toast from "react-hot-toast";
 import TicketLoading from "@/components/loading/loading";
+import coverImage from "@/assets/cover.png";
 
 const formSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
@@ -212,7 +213,7 @@ export default function Login() {
           </div>
 
           <Image
-            src="/cover.png"
+            src={coverImage}
             alt="Login Illustration"
             width={500}
             height={500}

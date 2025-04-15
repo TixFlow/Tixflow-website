@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-
+import loading from "@/assets/loading.gif";
 export default function LoadingOverlay() {
   return (
     <motion.div
@@ -11,7 +11,7 @@ export default function LoadingOverlay() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Image src="/loading.gif" alt="Loading..." width={80} height={80} />
+      <Image src={loading} alt="Loading..." width={80} height={80} />
     </motion.div>
   );
 }

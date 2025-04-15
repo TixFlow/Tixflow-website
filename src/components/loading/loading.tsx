@@ -13,7 +13,7 @@ interface TicketLoadingProps {
 export default function TicketLoading({
   message = "Đang tải vé, vui lòng đợi...",
   height = "h-full",
-  gifSrc = "/loading.gif",
+  gifSrc = "../../assets/loading.gif",
 }: TicketLoadingProps) {
   return (
     <div

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "../../../public/logo/logo2.png";
+import logo from "../../assets/logo/logo2.png";
 
 type LogoProps = {
   width?: number;
