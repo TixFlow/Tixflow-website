@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Image from "next/image";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import {
   Select,
@@ -33,9 +34,38 @@ interface Event {
   condition: string;
 }
 
+const STORAGE_KEYS = {
+  NEW_EVENT: "create_ticket_event_draft",
+  TICKET_DATA: "create_ticket_data_draft",
+  SELECTED_EVENT: "create_ticket_selected_event",
+  ACTIVE_TAB: "create_ticket_active_tab",
+};
+
+const saveToStorage = (key: string, data: unknown) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+};
+
+const getFromStorage = (key: string) => {
+  if (typeof window !== "undefined") {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  }
+  return null;
+};
+
+const clearTicketDrafts = () => {
+  Object.values(STORAGE_KEYS).forEach((key) => {
+    localStorage.removeItem(key);
+  });
+};
+
 export default function CreateTicketPage() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [selectedEventId, setSelectedEventId] = useState<string>(
+    getFromStorage(STORAGE_KEYS.SELECTED_EVENT) || ""
+  );
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +78,7 @@ export default function CreateTicketPage() {
     introduction: "",
     description: "",
     condition: "",
+    ...getFromStorage(STORAGE_KEYS.NEW_EVENT),
   });
 
   const [ticketData, setTicketData] = useState({
@@ -58,14 +89,16 @@ export default function CreateTicketPage() {
     quantity: 1,
     minInOrder: 1,
     maxInOrder: 10,
-    status: "available",
+    ...getFromStorage(STORAGE_KEYS.TICKET_DATA),
   });
 
   const [ticketId, setTicketId] = useState<string>("");
-  const [paymentLink, setPaymentLink] = useState<string>("");
+
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
-  const [activeTab, setActiveTab] = useState("tab1");
+  const [activeTab, setActiveTab] = useState(
+    getFromStorage(STORAGE_KEYS.ACTIVE_TAB) || "tab1"
+  );
 
   // Thêm state để lưu preview URL
   const [eventImagePreview, setEventImagePreview] = useState<string>("");
@@ -76,6 +109,12 @@ export default function CreateTicketPage() {
     event: false,
     ticket: false,
   });
+
+  // Thêm state để quản lý iframe
+  const [paymentIframe, setPaymentIframe] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<
+    "pending" | "success" | "failed"
+  >("pending");
 
   useEffect(() => {
     fetchEvents();
@@ -90,6 +129,35 @@ export default function CreateTicketPage() {
       }
     };
   }, [eventImagePreview, ticketImagePreview]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.NEW_EVENT, newEvent);
+  }, [newEvent]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.TICKET_DATA, ticketData);
+  }, [ticketData]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.SELECTED_EVENT, selectedEventId);
+  }, [selectedEventId]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.ACTIVE_TAB, activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "token" && !e.newValue) {
+        clearTicketDrafts();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const fetchEvents = async () => {
     try {
@@ -160,18 +228,74 @@ export default function CreateTicketPage() {
     }
   };
 
+  // Thêm các hàm validation
+  const validateEventForm = (event: typeof newEvent) => {
+    const errors: string[] = [];
+
+    if (!event.name.trim()) {
+      errors.push("Tên sự kiện không được để trống");
+    }
+    if (!event.coverUrl) {
+      errors.push("Ảnh bìa sự kiện là bắt buộc");
+    }
+    if (!event.location.trim()) {
+      errors.push("Địa điểm không được để trống");
+    }
+    if (!event.time) {
+      errors.push("Thời gian sự kiện là bắt buộc");
+    }
+    if (!event.type) {
+      errors.push("Loại sự kiện là bắt buộc");
+    }
+    if (!event.introduction.trim()) {
+      errors.push("Giới thiệu ngắn gọn không được để trống");
+    }
+    if (!event.description.trim()) {
+      errors.push("Mô tả chi tiết không được để trống");
+    }
+
+    return errors;
+  };
+
+  const validateTicketForm = (ticket: typeof ticketData) => {
+    const errors: string[] = [];
+
+    if (!ticket.name.trim()) {
+      errors.push("Tên vé không được để trống");
+    }
+    if (!ticket.imageUrl) {
+      errors.push("Ảnh vé là bắt buộc");
+    }
+    if (!ticket.description.trim()) {
+      errors.push("Mô tả vé không được để trống");
+    }
+    if (ticket.price <= 0) {
+      errors.push("Giá vé phải lớn hơn 0");
+    }
+    if (ticket.quantity < 1) {
+      errors.push("Số lượng vé phải ít nhất là 1");
+    }
+    if (ticket.minInOrder > ticket.maxInOrder) {
+      errors.push("Số lượng đặt tối thiểu không được lớn hơn tối đa");
+    }
+
+    return errors;
+  };
+
   const handleCreateEvent = async () => {
     try {
-      setLoading(true);
-      if (!newEvent.name || !newEvent.coverUrl || !newEvent.location) {
-        toast.error("Vui lòng điền đầy đủ thông tin sự kiện");
+      const errors = validateEventForm(newEvent);
+      if (errors.length > 0) {
+        errors.forEach((error) => toast.error(error));
         return;
       }
 
+      setLoading(true);
       const res = await api.post("/events", { ...newEvent });
       setSelectedEventId(res.data.data.id);
       setActiveTab("tab2");
       toast.success("Tạo sự kiện thành công");
+      localStorage.removeItem(STORAGE_KEYS.NEW_EVENT);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Lỗi không xác định";
@@ -183,12 +307,13 @@ export default function CreateTicketPage() {
 
   const handleCreateTicket = async () => {
     try {
-      setLoading(true);
-      if (!ticketData.name || !ticketData.imageUrl || ticketData.price <= 0) {
-        toast.error("Vui lòng điền đầy đủ thông tin vé");
+      const errors = validateTicketForm(ticketData);
+      if (errors.length > 0) {
+        errors.forEach((error) => toast.error(error));
         return;
       }
 
+      setLoading(true);
       const res = await api.post("/tickets", {
         ...ticketData,
         eventId: selectedEventId,
@@ -196,6 +321,7 @@ export default function CreateTicketPage() {
       setTicketId(res.data.data.id);
       setActiveTab("tab3");
       toast.success("Tạo vé thành công");
+      localStorage.removeItem(STORAGE_KEYS.TICKET_DATA);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Lỗi không xác định";
@@ -216,13 +342,45 @@ export default function CreateTicketPage() {
         price: total,
         quantity: ticketData.quantity,
       });
-      setPaymentLink(res.data.data.paymentLink);
+
+      // Thay vì set paymentLink, set iframe URL
+      setPaymentIframe(res.data.data.paymentUrl);
+
+      // Lắng nghe message từ iframe thanh toán
+      window.addEventListener("message", handlePaymentMessage);
     } catch (error) {
       console.error("Lỗi khi tạo đơn hàng:", error);
+      toast.error("Không thể tạo đơn hàng");
     } finally {
       setIsCreatingOrder(false);
     }
   };
+
+  // Thêm hàm xử lý message từ iframe
+  const handlePaymentMessage = (event: MessageEvent) => {
+    // Kiểm tra origin của message để đảm bảo an toàn
+    if (event.origin !== "https://your-payment-domain.com") return;
+
+    const { status } = event.data;
+
+    if (status === "success") {
+      setPaymentStatus("success");
+      toast.success("Thanh toán thành công!");
+      clearTicketDrafts();
+      // Có thể thêm redirect sau khi thanh toán thành công
+      // router.push('/tickets/my-tickets');
+    } else if (status === "failed") {
+      setPaymentStatus("failed");
+      toast.error("Thanh toán thất bại!");
+    }
+  };
+
+  // Cleanup event listener khi component unmount
+  useEffect(() => {
+    return () => {
+      window.removeEventListener("message", handlePaymentMessage);
+    };
+  }, []);
 
   return (
     <div className="max-w-xl mx-auto space-y-6 mt-10 p-4">
@@ -311,11 +469,20 @@ export default function CreateTicketPage() {
                   onChange={(e) =>
                     setNewEvent({ ...newEvent, name: e.target.value })
                   }
+                  className={`${!newEvent.name.trim() ? "border-red-300" : ""}`}
                 />
+                <div className="text-xs text-red-500">
+                  {!newEvent.name.trim() && "Tên sự kiện là bắt buộc"}
+                </div>
 
                 <div className="space-y-2">
                   <label className="text-sm text-gray-600">
                     Ảnh bìa sự kiện *
+                    {!newEvent.coverUrl && (
+                      <span className="text-xs text-red-500 ml-1">
+                        (Bắt buộc)
+                      </span>
+                    )}
                   </label>
                   <Input
                     type="file"
@@ -470,7 +637,7 @@ export default function CreateTicketPage() {
                       setIsUploading((prev) => ({ ...prev, ticket: true }));
                       const url = await handleFileUpload(file);
                       setTicketData({ ...ticketData, imageUrl: url });
-                      // Chỉ tạo preview URL sau khi upload thành công
+
                       const previewUrl = URL.createObjectURL(file);
                       setTicketImagePreview(previewUrl);
                       toast.success("Tải ảnh thành công");
@@ -483,13 +650,13 @@ export default function CreateTicketPage() {
                   }
                 }}
               />
-              {/* Hiển thị loading state */}
+
               {isUploading.ticket && (
                 <div className="flex items-center justify-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
                 </div>
               )}
-              {/* Preview image chỉ hiện khi có URL và không trong trạng thái upload */}
+
               {!isUploading.ticket &&
                 (ticketImagePreview || ticketData.imageUrl) && (
                   <div className="mt-2 relative w-full h-48">
@@ -530,7 +697,11 @@ export default function CreateTicketPage() {
               onChange={(e) =>
                 setTicketData({ ...ticketData, price: Number(e.target.value) })
               }
+              className={`${ticketData.price <= 0 ? "border-red-300" : ""}`}
             />
+            <div className="text-xs text-red-500">
+              {ticketData.price <= 0 && "Giá vé phải lớn hơn 0"}
+            </div>
 
             <Input
               placeholder="Số lượng vé *"
@@ -562,26 +733,145 @@ export default function CreateTicketPage() {
       )}
 
       {activeTab === "tab3" && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Bước 3: Thanh toán</h2>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">
+                Thanh toán phí đăng bán
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Hiển thị thông tin đơn hàng */}
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span>Giá vé:</span>
+                    <span>{ticketData.price.toLocaleString()}đ</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Số lượng:</span>
+                    <span>{ticketData.quantity}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>Phí đăng bán:</span>
+                    <span>
+                      {(ticketData.price > 1_000_000
+                        ? 50000
+                        : 30000
+                      ).toLocaleString()}
+                      đ
+                    </span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold">
+                    <span>Tổng cộng:</span>
+                    <span className="text-lg text-blue-600">
+                      {(
+                        (ticketData.price > 1_000_000 ? 50000 : 30000) *
+                        ticketData.quantity
+                      ).toLocaleString()}
+                      đ
+                    </span>
+                  </div>
+                </div>
 
-          <Button onClick={handleCreateOrder} disabled={isCreatingOrder}>
-            {isCreatingOrder ? "Đang xử lý..." : "Thanh toán"}
-          </Button>
+                {!paymentIframe && (
+                  <Button
+                    onClick={handleCreateOrder}
+                    disabled={isCreatingOrder}
+                    className="w-full"
+                  >
+                    {isCreatingOrder ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <span>Đang xử lý...</span>
+                      </div>
+                    ) : (
+                      "Tiến hành thanh toán"
+                    )}
+                  </Button>
+                )}
 
-          {paymentLink && (
-            <div className="pt-4">
-              <a
-                href={paymentLink}
-                target="_blank"
-                className="text-blue-600 underline"
-              >
-                Đi tới trang thanh toán
-              </a>
-            </div>
-          )}
+                {/* Phần iframe thanh toán */}
+                {paymentIframe && (
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent h-8 z-10"></div>
+                    <iframe
+                      src={paymentIframe}
+                      className="w-full h-[600px] rounded-lg border"
+                      frameBorder="0"
+                      allow="payment"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white to-transparent h-8 z-10"></div>
+                  </div>
+                )}
+
+                {/* Hiển thị trạng thái thanh toán */}
+                {paymentStatus === "success" && (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-lg text-green-700 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>
+                      Thanh toán thành công! Vé của bạn đã được đăng bán.
+                    </span>
+                  </div>
+                )}
+
+                {paymentStatus === "failed" && (
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-lg text-red-700 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    <span>Thanh toán thất bại! Vui lòng thử lại.</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
+
+      <div className="text-sm text-gray-500 mt-4">
+        <div className="flex items-center gap-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Các trường đánh dấu (*) là bắt buộc</span>
+        </div>
+      </div>
     </div>
   );
 }

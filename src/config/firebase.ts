@@ -2,14 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCK5bffhPGjYWp_ZnkxSzv8wBrqWqMR-5U",
-  authDomain: "ticketresell-f12aa.firebaseapp.com",
-  projectId: "ticketresell-f12aa",
-  storageBucket: "ticketresell-f12aa.firebasestorage.app",
-  messagingSenderId: "754722843583",
-  appId: "1:754722843583:web:9b8f838532dec12a770f0a",
-  measurementId: "G-5VWRVXP1E1",
+  apiKey: "AIzaSyAx2Pauwl6ZufjFPzqz3WfHZGu1B98U3dE",
+  authDomain: "tixflow-cb2a0.firebaseapp.com",
+  projectId: "tixflow-cb2a0",
+  storageBucket: "tixflow-cb2a0.firebasestorage.app",
+  messagingSenderId: "683703747505",
+  appId: "1:683703747505:web:d43b4e6e021c915eb7f390",
+  measurementId: "G-QD6FVHWPNC",
 };
+
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
