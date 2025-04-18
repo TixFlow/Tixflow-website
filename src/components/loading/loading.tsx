@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import React from "react";
-
+import gifSrc from "../../assets/loading.gif";
 interface TicketLoadingProps {
   message?: string;
   height?: string;
@@ -13,7 +13,6 @@ interface TicketLoadingProps {
 export default function TicketLoading({
   message = "Đang tải vé, vui lòng đợi...",
   height = "h-full",
-  gifSrc = "../../assets/loading.gif",
 }: TicketLoadingProps) {
   return (
     <div

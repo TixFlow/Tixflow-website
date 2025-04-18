@@ -3,10 +3,8 @@ import SlideIndex from "@/components/SlideIndex/SlideIndex";
 import TicketListByCategory from "./home/TicketListByCategory";
 import FadeInOnScroll from "@/components/FadeInOnScroll";
 import Logo2 from "@/components/logo/Logo2";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Home() {
-  const isMobile = useIsMobile();
   return (
     <div className="bg-gray-100">
       <div className="flex px-10 py-4">

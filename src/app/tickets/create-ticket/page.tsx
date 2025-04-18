@@ -64,12 +64,11 @@ const clearTicketDrafts = () => {
 };
 
 const EVENTS_CACHE_KEY = "events_cache";
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
 
 const MemoizedSelect = memo(Select);
 const MemoizedButton = memo(Button);
 
-// Thêm interface cho validation rules
 interface ValidationRule {
   (value: string | number): string | null;
 }
@@ -117,23 +116,12 @@ export default function CreateTicketPage() {
     getFromStorage(STORAGE_KEYS.ACTIVE_TAB) || "tab1"
   );
 
-  // Thêm state để lưu preview URL
   const [eventImagePreview, setEventImagePreview] = useState<string>("");
   const [ticketImagePreview, setTicketImagePreview] = useState<string>("");
 
-  // Thêm state để track trạng thái upload
-  const [isUploading, setIsUploading] = useState({
-    event: false,
-    ticket: false,
-  });
-
-  // Thêm state để quản lý iframe
-  const [paymentIframe, setPaymentIframe] = useState<string>("");
-  const [paymentStatus, setPaymentStatus] = useState<
-    "pending" | "success" | "failed"
-  >("pending");
-
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const fetchEvents = useCallback(async () => {
     if (isLoadingEvents) return;
@@ -375,6 +363,7 @@ export default function CreateTicketPage() {
   // Tối ưu các handler functions
   const handleCreateOrder = useCallback(async () => {
     setIsCreatingOrder(true);
+    setIsRedirecting(false);
     try {
       const total = fee * ticketData.quantity;
       const res = await api.post("/orders", {
@@ -383,49 +372,42 @@ export default function CreateTicketPage() {
         price: total,
         quantity: ticketData.quantity,
       });
-      setPaymentIframe(res.data.data.paymentUrl);
+
+      console.log("Full response:", res.data); // Để debug
+
+      // Kiểm tra response và lấy URL thanh toán
+      if (res.data?.data?.paymentLink) {
+        // Thay đổi từ paymentUrl thành paymentLink
+        setIsRedirecting(true);
+        toast.success("Đang chuyển đến trang thanh toán...");
+
+        // Lưu trạng thái trước khi chuyển hướng
+        localStorage.setItem(
+          "PAYMENT_PENDING",
+          JSON.stringify({
+            ticketId,
+            orderId: res.data.data.id,
+            timestamp: Date.now(),
+          })
+        );
+
+        // Chuyển hướng ngay lập tức
+        window.location.href = res.data.data.paymentLink; // Thay đổi từ paymentUrl thành paymentLink
+      } else {
+        console.error("Response structure:", res.data);
+        throw new Error("Không tìm thấy link thanh toán trong response");
+      }
     } catch (error) {
-      console.error("Lỗi khi tạo đơn hàng:", error);
-      toast.error("Không thể tạo đơn hàng");
+      console.error("Error creating order:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Không thể tạo đơn hàng";
+      toast.error(`Lỗi: ${errorMessage}`);
+      setIsRedirecting(false);
     } finally {
       setIsCreatingOrder(false);
     }
   }, [fee, ticketData.quantity, ticketId]);
 
-  const handlePaymentMessage = useCallback((event: MessageEvent) => {
-    if (event.origin !== "https://your-payment-domain.com") return;
-
-    const { status } = event.data;
-
-    if (status === "success") {
-      setPaymentStatus("success");
-      toast.success("Thanh toán thành công!");
-      clearTicketDrafts();
-    } else if (status === "failed") {
-      setPaymentStatus("failed");
-      toast.error("Thanh toán thất bại!");
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("message", handlePaymentMessage);
-    return () => window.removeEventListener("message", handlePaymentMessage);
-  }, [handlePaymentMessage]);
-
-  useEffect(() => {
-    return () => {
-      // Cleanup localStorage
-      Object.values(STORAGE_KEYS).forEach((key) =>
-        localStorage.removeItem(key)
-      );
-
-      // Cleanup image previews
-      if (eventImagePreview) URL.revokeObjectURL(eventImagePreview);
-      if (ticketImagePreview) URL.revokeObjectURL(ticketImagePreview);
-    };
-  }, [eventImagePreview, ticketImagePreview]);
-
-  // Thêm hàm xử lý quay lại
   const handleBack = useCallback(() => {
     if (activeTab === "tab2") {
       setActiveTab("tab1");
@@ -436,7 +418,6 @@ export default function CreateTicketPage() {
     }
   }, [activeTab]);
 
-  // Thêm hàm xử lý lưu trạng thái
   const handleSaveState = useCallback(() => {
     const state = {
       selectedEventId,
@@ -448,7 +429,6 @@ export default function CreateTicketPage() {
     toast.success("Đã lưu trạng thái");
   }, [selectedEventId, ticketData, activeTab, newEvent]);
 
-  // Thêm useEffect để khôi phục trạng thái khi load trang
   useEffect(() => {
     const savedState = getFromStorage("CREATE_TICKET_STATE");
     if (savedState) {
@@ -652,15 +632,11 @@ export default function CreateTicketPage() {
                     <Input
                       type="file"
                       accept="image/*"
-                      disabled={isUploading.event}
+                      disabled={isCreatingOrder}
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           try {
-                            setIsUploading((prev) => ({
-                              ...prev,
-                              event: true,
-                            }));
                             const url = await handleFileUpload(file);
                             setNewEvent({ ...newEvent, coverUrl: url });
                             // Chỉ tạo preview URL sau khi upload thành công
@@ -670,23 +646,12 @@ export default function CreateTicketPage() {
                           } catch (error) {
                             console.error(error);
                             toast.error("Lỗi khi tải ảnh");
-                          } finally {
-                            setIsUploading((prev) => ({
-                              ...prev,
-                              event: false,
-                            }));
                           }
                         }
                       }}
                     />
 
-                    {isUploading.event && (
-                      <div className="flex items-center justify-center py-4">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                      </div>
-                    )}
-
-                    {!isUploading.event &&
+                    {!isCreatingOrder &&
                       (eventImagePreview || newEvent.coverUrl) && (
                         <div className="mt-2 relative w-full h-48">
                           <Image
@@ -838,12 +803,11 @@ export default function CreateTicketPage() {
                 <Input
                   type="file"
                   accept="image/*"
-                  disabled={isUploading.ticket}
+                  disabled={isCreatingOrder}
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
                       try {
-                        setIsUploading((prev) => ({ ...prev, ticket: true }));
                         const url = await handleFileUpload(file);
                         setTicketData({ ...ticketData, imageUrl: url });
 
@@ -853,20 +817,12 @@ export default function CreateTicketPage() {
                       } catch (error) {
                         console.error(error);
                         toast.error("Lỗi khi tải ảnh");
-                      } finally {
-                        setIsUploading((prev) => ({ ...prev, ticket: false }));
                       }
                     }
                   }}
                 />
 
-                {isUploading.ticket && (
-                  <div className="flex items-center justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                  </div>
-                )}
-
-                {!isUploading.ticket &&
+                {!isCreatingOrder &&
                   (ticketImagePreview || ticketData.imageUrl) && (
                     <div className="mt-2 relative w-full h-48">
                       <Image
@@ -976,7 +932,6 @@ export default function CreateTicketPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Hiển thị thông tin đơn hàng */}
                   <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                     <div className="flex justify-between">
                       <span>Giá vé:</span>
@@ -1008,79 +963,32 @@ export default function CreateTicketPage() {
                     </div>
                   </div>
 
-                  {!paymentIframe && (
-                    <MemoizedButton
-                      onClick={handleCreateOrder}
-                      disabled={isCreatingOrder}
-                      className="w-full"
-                    >
-                      {isCreatingOrder ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          <span>Đang xử lý...</span>
-                        </div>
-                      ) : (
-                        "Tiến hành thanh toán"
-                      )}
-                    </MemoizedButton>
-                  )}
+                  <MemoizedButton
+                    onClick={handleCreateOrder}
+                    disabled={isCreatingOrder || isRedirecting}
+                    className="w-full"
+                  >
+                    {isCreatingOrder ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <span>Đang xử lý...</span>
+                      </div>
+                    ) : isRedirecting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <span>Đang chuyển hướng...</span>
+                      </div>
+                    ) : (
+                      "Tiến hành thanh toán"
+                    )}
+                  </MemoizedButton>
 
-                  {/* Phần iframe thanh toán */}
-                  {paymentIframe && (
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent h-8 z-10"></div>
-                      <iframe
-                        src={paymentIframe}
-                        className="w-full h-[600px] rounded-lg border"
-                        frameBorder="0"
-                        allow="payment"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white to-transparent h-8 z-10"></div>
-                    </div>
-                  )}
-
-                  {/* Hiển thị trạng thái thanh toán */}
-                  {paymentStatus === "success" && (
-                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg text-green-700 flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <span>
-                        Thanh toán thành công! Vé của bạn đã được đăng bán.
-                      </span>
-                    </div>
-                  )}
-
-                  {paymentStatus === "failed" && (
-                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg text-red-700 flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                      <span>Thanh toán thất bại! Vui lòng thử lại.</span>
-                    </div>
-                  )}
+                  <div className="text-sm text-gray-500 text-center mt-4">
+                    <p>Bạn sẽ được chuyển đến trang thanh toán an toàn</p>
+                    <p>
+                      Vui lòng không đóng trình duyệt trong quá trình thanh toán
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
