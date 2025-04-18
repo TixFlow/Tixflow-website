@@ -2,19 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "cdn-images.vtv.vn",
-      "giadinh.mediacdn.vn",
-      "https://kenh14cdn.com",
-      "firebasestorage.googleapis.com",
-    ],
+    domains: ["firebasestorage.googleapis.com"],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "assets.example.com",
+        hostname: "firebasestorage.googleapis.com",
         port: "",
-        pathname: "/account123/**",
-        search: "",
+        pathname: "/v0/b/tixflow-cb2a0.firebasestorage.app/o/**",
       },
     ],
   },
