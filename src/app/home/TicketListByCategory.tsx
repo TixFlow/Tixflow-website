@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -13,6 +12,7 @@ import {
 import api from "@/config/axios";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 interface Event {
   id: string;
@@ -117,13 +117,16 @@ export default function EventListByCategory() {
                       <CardContent className="p-0">
                         <div className="relative h-48 w-full overflow-hidden">
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all z-10" />
-                          <Image
-                            src={event.coverUrl}
-                            alt={event.name}
-                            fill
-                            className="object-cover transform group-hover:scale-110 transition-transform duration-500"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          />
+                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden mb-6">
+                            <ImageWithFallback
+                              src={event.coverUrl}
+                              alt={event.name}
+                              className="object-cover"
+                              fill
+                              sizes="(max-width: 1280px) 100vw, 1280px"
+                              priority
+                            />
+                          </div>
                           <div className="absolute top-3 right-3 z-20">
                             <span className="px-3 py-1 bg-primary/90 text-white text-sm rounded-full">
                               Đang bán
@@ -204,3 +207,5 @@ export default function EventListByCategory() {
     </div>
   );
 }
+
+export const isProduction = process.env.NODE_ENV === "production";
