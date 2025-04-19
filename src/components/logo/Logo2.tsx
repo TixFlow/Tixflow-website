@@ -9,25 +9,25 @@ type LogoProps = {
   className?: string;
 };
 
-const Logo2: React.FC<LogoProps> = ({
+const Logo: React.FC<LogoProps> = ({
   width = 100,
   height = 100,
   className,
 }) => {
   return (
     <Link href="/">
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className}`} style={{ width, height }}>
         <Image
           src={logo}
           alt="TIXFLOW"
-          width={width}
-          height={height}
+          fill
           priority
           className="object-contain"
+          sizes="(max-width: 768px) 120px, 100px"
         />
       </div>
     </Link>
   );
 };
 
-export default Logo2;
+export default Logo;

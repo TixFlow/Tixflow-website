@@ -16,14 +16,14 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   return (
     <Link href="/">
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className}`} style={{ width, height }}>
         <Image
           src={logo}
           alt="TIXFLOW"
-          width={width}
-          height={height}
+          fill
           priority
           className="object-contain"
+          sizes="(max-width: 768px) 120px, 100px"
         />
       </div>
     </Link>

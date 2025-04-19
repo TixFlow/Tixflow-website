@@ -113,7 +113,7 @@ export default function EventListByCategory() {
                     key={event.id}
                     className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                   >
-                    <Card className="overflow-hidden group transition-all duration-300 hover:shadow-xl">
+                    <Card className="overflow-hidden group py-0 transition-all duration-300 hover:shadow-xl">
                       <CardContent className="p-0">
                         <div className="relative h-48 w-full overflow-hidden">
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all z-10" />
