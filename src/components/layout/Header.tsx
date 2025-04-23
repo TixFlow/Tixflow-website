@@ -22,7 +22,7 @@ import { useDispatch } from "react-redux";
 const NAV_ITEMS = [
   { href: "/tickets/legal-document", label: "Đăng bán vé" },
   { href: "/tickets", label: "Mua vé" },
-  { href: "/blogs", label: "Blogs sự kiện" },
+  // { href: "/blogs", label: "Blogs sự kiện" },
 ];
 
 const SOCIAL_LINKS = [
@@ -58,6 +58,11 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/auth/login");
+  };
 
   if (!isAuthReady) {
     return (
@@ -120,16 +125,13 @@ export default function Header() {
 
               <DropdownMenuContent className="w-48">
                 <DropdownMenuItem asChild>
-                  <Link href="/account/my-tickets">Vé đã mua</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/account/our-tickets">Vé đăng bán</Link>
+                  <Link href="/account/my-tickets">Vé của tôi</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/account/profile">Tài khoản của tôi</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => dispatch(logout())}>
+                <DropdownMenuItem onClick={handleLogout}>
                   Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>

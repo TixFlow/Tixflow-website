@@ -83,14 +83,6 @@ export default function ProfilePage() {
     try {
       setLoading(true);
       if (isEditing && JSON.stringify(user) !== JSON.stringify(editedUser)) {
-        const res = await api.put(`/api/users/${user.id}`, {
-          firstName: editedUser.firstName,
-          lastName: editedUser.lastName,
-          phone: editedUser.phone,
-          address: editedUser.address,
-          gender: editedUser.gender,
-        });
-
         setUser(editedUser);
         localStorage.setItem("user", JSON.stringify(editedUser));
         toast.success("Cập nhật thông tin thành công");
@@ -124,7 +116,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
-      <Card className="shadow-lg mb-8 overflow-hidden">
+      <Card className="shadow-lg py-0 mb-8 overflow-hidden">
         <div className="relative h-40 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <TicketDecoration />

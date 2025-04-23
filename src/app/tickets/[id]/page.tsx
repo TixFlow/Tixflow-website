@@ -207,11 +207,7 @@ export default function TicketDetailPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() =>
-                        router.push(
-                          `/tickets/create-ticket?ticketId=${ticket.id}`
-                        )
-                      }
+                      onClick={() => router.push(`/ticket/${ticket.id}`)}
                       disabled={ticket.quantity === 0}
                       className={`w-full mt-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                         ticket.quantity === 0

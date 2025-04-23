@@ -44,7 +44,7 @@ function TicketCard({ ticket }: TicketCardProps) {
   const router = useRouter();
 
   const handleViewDetail = () => {
-    router.push(`/tickets/tickets/${ticket.id}`);
+    router.push(`/ticket/${ticket.id}`);
   };
 
   return (
@@ -118,7 +118,7 @@ export default function TicketList() {
         setLoading(true);
         const response = await api.get("/tickets");
         const approvedTickets = response.data.data.filter(
-          (ticket: Ticket) => ticket.status === "approved"
+          (ticket: Ticket) => ticket.status === "approved" || "pending"
         );
         setTickets(approvedTickets);
       } catch (error) {
