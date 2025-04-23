@@ -119,9 +119,17 @@ export default function CreateTicketPage() {
   const [eventImagePreview, setEventImagePreview] = useState<string>("");
   const [ticketImagePreview, setTicketImagePreview] = useState<string>("");
 
-  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [isUploading, setIsUploading] = useState({
+    event: false,
+    ticket: false,
+  });
 
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [paymentIframe, setPaymentIframe] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<
+    "pending" | "success" | "failed"
+  >("pending");
+
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
 
   const fetchEvents = useCallback(async () => {
     if (isLoadingEvents) return;
@@ -363,7 +371,6 @@ export default function CreateTicketPage() {
   // Tối ưu các handler functions
   const handleCreateOrder = useCallback(async () => {
     setIsCreatingOrder(true);
-    setIsRedirecting(false);
     try {
       const total = fee * ticketData.quantity;
       const res = await api.post("/orders", {
@@ -373,40 +380,45 @@ export default function CreateTicketPage() {
         quantity: ticketData.quantity,
       });
 
-      console.log("Full response:", res.data); // Để debug
-
-      // Kiểm tra response và lấy URL thanh toán
-      if (res.data?.data?.paymentLink) {
-        // Thay đổi từ paymentUrl thành paymentLink
-        setIsRedirecting(true);
-        toast.success("Đang chuyển đến trang thanh toán...");
-
-        // Lưu trạng thái trước khi chuyển hướng
-        localStorage.setItem(
-          "PAYMENT_PENDING",
-          JSON.stringify({
-            ticketId,
-            orderId: res.data.data.id,
-            timestamp: Date.now(),
-          })
-        );
-
-        // Chuyển hướng ngay lập tức
-        window.location.href = res.data.data.paymentLink; // Thay đổi từ paymentUrl thành paymentLink
-      } else {
-        console.error("Response structure:", res.data);
-        throw new Error("Không tìm thấy link thanh toán trong response");
-      }
+      window.location.href = res.data.data.paymentLink;
     } catch (error) {
-      console.error("Error creating order:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Không thể tạo đơn hàng";
-      toast.error(`Lỗi: ${errorMessage}`);
-      setIsRedirecting(false);
+      console.error("Lỗi khi tạo đơn hàng:", error);
+      toast.error("Không thể tạo đơn hàng");
     } finally {
       setIsCreatingOrder(false);
     }
   }, [fee, ticketData.quantity, ticketId]);
+
+  const handlePaymentMessage = useCallback((event: MessageEvent) => {
+    if (event.origin !== "https://tixflow.net/") return;
+
+    const { status } = event.data;
+
+    if (status === "success") {
+      setPaymentStatus("success");
+      toast.success("Thanh toán thành công!");
+      clearTicketDrafts();
+    } else if (status === "failed") {
+      setPaymentStatus("failed");
+      toast.error("Thanh toán thất bại!");
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("message", handlePaymentMessage);
+    return () => window.removeEventListener("message", handlePaymentMessage);
+  }, [handlePaymentMessage]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(STORAGE_KEYS).forEach((key) =>
+        localStorage.removeItem(key)
+      );
+
+      if (eventImagePreview) URL.revokeObjectURL(eventImagePreview);
+      if (ticketImagePreview) URL.revokeObjectURL(ticketImagePreview);
+    };
+  }, [eventImagePreview, ticketImagePreview]);
 
   const handleBack = useCallback(() => {
     if (activeTab === "tab2") {
@@ -632,11 +644,15 @@ export default function CreateTicketPage() {
                     <Input
                       type="file"
                       accept="image/*"
-                      disabled={isCreatingOrder}
+                      disabled={isUploading.event}
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           try {
+                            setIsUploading((prev) => ({
+                              ...prev,
+                              event: true,
+                            }));
                             const url = await handleFileUpload(file);
                             setNewEvent({ ...newEvent, coverUrl: url });
                             // Chỉ tạo preview URL sau khi upload thành công
@@ -646,12 +662,23 @@ export default function CreateTicketPage() {
                           } catch (error) {
                             console.error(error);
                             toast.error("Lỗi khi tải ảnh");
+                          } finally {
+                            setIsUploading((prev) => ({
+                              ...prev,
+                              event: false,
+                            }));
                           }
                         }
                       }}
                     />
 
-                    {!isCreatingOrder &&
+                    {isUploading.event && (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+                      </div>
+                    )}
+
+                    {!isUploading.event &&
                       (eventImagePreview || newEvent.coverUrl) && (
                         <div className="mt-2 relative w-full h-48">
                           <Image
@@ -803,11 +830,12 @@ export default function CreateTicketPage() {
                 <Input
                   type="file"
                   accept="image/*"
-                  disabled={isCreatingOrder}
+                  disabled={isUploading.ticket}
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
                       try {
+                        setIsUploading((prev) => ({ ...prev, ticket: true }));
                         const url = await handleFileUpload(file);
                         setTicketData({ ...ticketData, imageUrl: url });
 
@@ -817,12 +845,20 @@ export default function CreateTicketPage() {
                       } catch (error) {
                         console.error(error);
                         toast.error("Lỗi khi tải ảnh");
+                      } finally {
+                        setIsUploading((prev) => ({ ...prev, ticket: false }));
                       }
                     }
                   }}
                 />
 
-                {!isCreatingOrder &&
+                {isUploading.ticket && (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+                  </div>
+                )}
+
+                {!isUploading.ticket &&
                   (ticketImagePreview || ticketData.imageUrl) && (
                     <div className="mt-2 relative w-full h-48">
                       <Image
@@ -962,33 +998,64 @@ export default function CreateTicketPage() {
                       </span>
                     </div>
                   </div>
+                  {!paymentIframe && (
+                    <MemoizedButton
+                      onClick={handleCreateOrder}
+                      disabled={isCreatingOrder}
+                      className="w-full"
+                    >
+                      {isCreatingOrder ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          <span>Đang xử lý...</span>
+                        </div>
+                      ) : (
+                        "Tiến hành thanh toán"
+                      )}
+                    </MemoizedButton>
+                  )}
 
-                  <MemoizedButton
-                    onClick={handleCreateOrder}
-                    disabled={isCreatingOrder || isRedirecting}
-                    className="w-full"
-                  >
-                    {isCreatingOrder ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                        <span>Đang xử lý...</span>
-                      </div>
-                    ) : isRedirecting ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                        <span>Đang chuyển hướng...</span>
-                      </div>
-                    ) : (
-                      "Tiến hành thanh toán"
-                    )}
-                  </MemoizedButton>
+                  {paymentStatus === "success" && (
+                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg text-green-700 flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <span>
+                        Thanh toán thành công! Vé của bạn đã được đăng bán.
+                      </span>
+                    </div>
+                  )}
 
-                  <div className="text-sm text-gray-500 text-center mt-4">
-                    <p>Bạn sẽ được chuyển đến trang thanh toán an toàn</p>
-                    <p>
-                      Vui lòng không đóng trình duyệt trong quá trình thanh toán
-                    </p>
-                  </div>
+                  {paymentStatus === "failed" && (
+                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg text-red-700 flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                      <span>Thanh toán thất bại! Vui lòng thử lại.</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

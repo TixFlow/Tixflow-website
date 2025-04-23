@@ -11,14 +11,7 @@ interface ImageProps {
   priority?: boolean;
 }
 
-export function ImageWithFallback({
-  src,
-  alt,
-  className,
-  fill,
-  sizes,
-  priority,
-}: ImageProps) {
+export function ImageWithFallback({ src, alt, className }: ImageProps) {
   const isProduction = process.env.NODE_ENV === "production";
 
   if (isProduction) {
@@ -31,9 +24,9 @@ export function ImageWithFallback({
       src={src}
       alt={alt}
       className={className}
-      fill={fill}
-      sizes={sizes}
-      priority={priority}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      priority
     />
   );
 }

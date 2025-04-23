@@ -90,7 +90,7 @@ function TicketCard({ ticket }: TicketCardProps) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/tickets/tickets/${ticket.id}`);
+            router.push(`/ticket/${ticket.id}`);
           }}
           disabled={ticket.quantity === 0}
           className={`w-full mt-2 py-2 rounded-lg font-medium transition-all duration-300 ${
